@@ -6,6 +6,12 @@ import { emptyResult } from "./types";
 
 // -------- shared loader helpers --------
 
+
+// Dynamic-import URLs via a variable so TypeScript's module resolver doesn't
+// try to resolve remote URLs at build time.
+const cdnImport = (url: string): Promise<any> =>
+  (new Function("u", "return import(/* @vite-ignore */ u)"))(url);
+
 const scriptCache = new Map<string, Promise<void>>();
 function loadScript(src: string): Promise<void> {
   if (scriptCache.has(src)) return scriptCache.get(src)!;
@@ -70,7 +76,7 @@ function formatError(e: unknown): string {
 
 export async function runTs(code: string): Promise<RunResult> {
   const ts = await once<any>("typescript", async () => {
-    const mod = await import(/* @vite-ignore */ "https://esm.sh/typescript@5.6.3");
+    const mod = await cdnImport("https://esm.sh/typescript@5.6.3");
     return mod.default ?? mod;
   });
   const diagnostics: Diagnostic[] = [];
@@ -133,7 +139,7 @@ export async function runPython(code: string): Promise<RunResult> {
 
 export async function runLua(code: string): Promise<RunResult> {
   const factory = await once<any>("lua", async () => {
-    const mod = await import(/* @vite-ignore */ "https://esm.sh/wasmoon@1.16.0");
+    const mod = await cdnImport("https://esm.sh/wasmoon@1.16.0");
     const f = new mod.LuaFactory();
     return f;
   });
@@ -162,7 +168,7 @@ export async function runLua(code: string): Promise<RunResult> {
 
 export async function runSql(code: string): Promise<RunResult> {
   const SQL = await once<any>("sql", async () => {
-    const mod = await import(/* @vite-ignore */ "https://esm.sh/sql.js@1.11.0");
+    const mod = await cdnImport("https://esm.sh/sql.js@1.11.0");
     const initSqlJs = (mod.default ?? mod);
     return await initSqlJs({ locateFile: (f: string) => `https://esm.sh/sql.js@1.11.0/dist/${f}` });
   });
@@ -205,7 +211,7 @@ function formatSqlTable(cols: string[], rows: unknown[][]): string {
 
 export async function runRuby(code: string): Promise<RunResult> {
   const vm = await once<any>("ruby", async () => {
-    const mod = await import(/* @vite-ignore */ "https://cdn.jsdelivr.net/npm/@ruby/3.3-wasm-wasi@2.7.1/dist/browser/+esm");
+    const mod = await cdnImport("https://cdn.jsdelivr.net/npm/@ruby/3.3-wasm-wasi@2.7.1/dist/browser/+esm");
     const { DefaultRubyVM } = mod;
     const response = await fetch(
       "https://cdn.jsdelivr.net/npm/@ruby/3.3-wasm-wasi@2.7.1/dist/ruby+stdlib.wasm"
@@ -250,7 +256,7 @@ export async function runRuby(code: string): Promise<RunResult> {
 
 export async function runPhp(code: string): Promise<RunResult> {
   const php = await once<any>("php", async () => {
-    const mod = await import(/* @vite-ignore */ "https://esm.sh/php-wasm@0.0.9/PhpWeb.mjs");
+    const mod = await cdnImport("https://esm.sh/php-wasm@0.0.9/PhpWeb.mjs");
     const { PhpWeb } = mod;
     const p = new PhpWeb();
     await p.binary;
