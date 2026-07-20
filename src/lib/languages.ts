@@ -147,6 +147,18 @@ local function greet(name) return "Hello, " .. name .. "!" end
 for i = 0, 2 do print(greet("world #" .. i)) end
 `;
 
+const perl = `#!/usr/bin/perl
+# Perl — PLInt
+use strict; use warnings;
+sub greet { my ($n) = @_; return "Hello, $n!"; }
+for my $i (0..2) { print greet("world #$i"), "\\n"; }
+`;
+
+const r = `# R — PLInt
+greet <- function(name) paste0("Hello, ", name, "!")
+for (i in 0:2) cat(greet(paste0("world #", i)), "\\n")
+`;
+
 export const LANGUAGES: LanguageDef[] = [
   {
     id: "python", name: "Python", monaco: "python", runtime: "python",
@@ -232,6 +244,16 @@ export const LANGUAGES: LanguageDef[] = [
     id: "lua", name: "Lua", monaco: "lua", runtime: "lua",
     ext: ".lua", sample: lua,
     syntax: { comment: "-- comment", variable: "local x = 10", fn: "function f(x) ... end", io: "print(x)", loop: "for i = 1, n do ... end", conditional: "if x > 0 then ... end" },
+  },
+  {
+    id: "perl", name: "Perl", monaco: "perl", runtime: "server", serverId: "perl",
+    ext: ".pl", sample: perl,
+    syntax: { comment: "# comment", variable: "my $x = 10;", fn: "sub f { my ($x) = @_; ... }", io: "print $x;", loop: "for my $i (0..$n) { ... }", conditional: "if ($x > 0) { ... }" },
+  },
+  {
+    id: "r", name: "R", monaco: "r", runtime: "server", serverId: "r",
+    ext: ".R", sample: r,
+    syntax: { comment: "# comment", variable: "x <- 10", fn: "f <- function(x) ...", io: "cat(x)", loop: "for (i in 1:n) { ... }", conditional: "if (x > 0) { ... }" },
   },
 ];
 

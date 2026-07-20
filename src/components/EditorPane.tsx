@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import type { LanguageDef } from "@/lib/languages";
+import { useSettings } from "@/lib/settings";
 
 interface Props {
   language: LanguageDef;
@@ -12,11 +13,11 @@ export function EditorPane({ language, value, onChange }: Props) {
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
   const [ready, setReady] = useState(false);
+  const [settings] = useSettings();
 
   const onMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-    // Define a PLInt theme once.
     monaco.editor.defineTheme("plint-dark", {
       base: "vs-dark",
       inherit: true,
@@ -43,7 +44,6 @@ export function EditorPane({ language, value, onChange }: Props) {
     setReady(true);
   };
 
-  // Re-apply theme after language changes (Monaco resets on model swap sometimes).
   useEffect(() => {
     if (ready && monacoRef.current) {
       monacoRef.current.editor.setTheme("plint-dark");
@@ -51,24 +51,32 @@ export function EditorPane({ language, value, onChange }: Props) {
   }, [language.id, ready]);
 
   return (
-    <div className="h-full w-full overflow-hidden rounded-lg border border-border bg-[oklch(0.14_0.015_240)]">
+    <div className="h-full w-full overflow-hidden rounded-lg border border-border bg-[oklch(0.14_0.015_240)] animate-fade-in">
       <Editor
         height="100%"
         language={language.monaco}
         value={value}
         onChange={(v) => onChange(v ?? "")}
         onMount={onMount}
+        loading={
+          <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+            <span className="ml-2">loading editor…</span>
+          </div>
+        }
         options={{
           fontFamily: "JetBrains Mono, Fira Code, ui-monospace, monospace",
-          fontSize: 14,
-          fontLigatures: true,
-          minimap: { enabled: false },
+          fontSize: settings.fontSize,
+          fontLigatures: settings.ligatures,
+          minimap: { enabled: settings.minimap },
+          wordWrap: settings.wordWrap ? "on" : "off",
+          lineNumbers: settings.lineNumbers ? "on" : "off",
+          tabSize: settings.tabSize,
           smoothScrolling: true,
           cursorSmoothCaretAnimation: "on",
           scrollBeyondLastLine: false,
           padding: { top: 16, bottom: 16 },
           renderLineHighlight: "all",
-          tabSize: 2,
           automaticLayout: true,
         }}
       />
