@@ -245,6 +245,16 @@ export const LANGUAGES: LanguageDef[] = [
     ext: ".lua", sample: lua,
     syntax: { comment: "-- comment", variable: "local x = 10", fn: "function f(x) ... end", io: "print(x)", loop: "for i = 1, n do ... end", conditional: "if x > 0 then ... end" },
   },
+  {
+    id: "perl", name: "Perl", monaco: "perl", runtime: "server", serverId: "perl",
+    ext: ".pl", sample: perl,
+    syntax: { comment: "# comment", variable: "my $x = 10;", fn: "sub f { my ($x) = @_; ... }", io: "print $x;", loop: "for my $i (0..$n) { ... }", conditional: "if ($x > 0) { ... }" },
+  },
+  {
+    id: "r", name: "R", monaco: "r", runtime: "server", serverId: "r",
+    ext: ".R", sample: r,
+    syntax: { comment: "# comment", variable: "x <- 10", fn: "f <- function(x) ...", io: "cat(x)", loop: "for (i in 1:n) { ... }", conditional: "if (x > 0) { ... }" },
+  },
 ];
 
 export const LANG_BY_ID = Object.fromEntries(LANGUAGES.map((l) => [l.id, l]));
