@@ -147,6 +147,18 @@ local function greet(name) return "Hello, " .. name .. "!" end
 for i = 0, 2 do print(greet("world #" .. i)) end
 `;
 
+const perl = `#!/usr/bin/perl
+# Perl — PLInt
+use strict; use warnings;
+sub greet { my ($n) = @_; return "Hello, $n!"; }
+for my $i (0..2) { print greet("world #$i"), "\\n"; }
+`;
+
+const r = `# R — PLInt
+greet <- function(name) paste0("Hello, ", name, "!")
+for (i in 0:2) cat(greet(paste0("world #", i)), "\\n")
+`;
+
 export const LANGUAGES: LanguageDef[] = [
   {
     id: "python", name: "Python", monaco: "python", runtime: "python",
