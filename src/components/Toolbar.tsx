@@ -1,4 +1,4 @@
-import { Files, Play, RotateCcw, Settings2 } from "lucide-react";
+import { Files, Play, RotateCcw, Sliders } from "lucide-react";
 import type { LanguageDef } from "@/lib/languages";
 
 interface Props {
@@ -22,73 +22,55 @@ export function Toolbar({
 }: Props) {
   return (
     <header className="relative flex items-center justify-between gap-2 border-b border-border bg-surface px-3 py-2 sm:px-4">
-      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+      <div className="flex min-w-0 items-center gap-3">
         <div className="flex shrink-0 items-center gap-2">
-          <div
-            className="grid h-7 w-7 place-items-center rounded-md transition-transform hover:scale-110"
-            style={{ background: "var(--gradient-brand)" }}
+          <span
+            aria-hidden
+            className="grid h-6 w-6 place-items-center rounded-[4px] border border-border bg-surface-2 font-mono text-[11px] text-primary"
           >
-            <span className="text-[13px] font-black text-primary-foreground">P</span>
-          </div>
+            $_
+          </span>
           <div className="leading-tight">
-            <div className="text-sm font-semibold tracking-tight">
-              PL<span className="brand-gradient-text">Int</span>
-            </div>
-            <div className="hidden text-[10px] text-muted-foreground -mt-0.5 sm:block">
-              programming language interpreter hub
+            <div className="font-mono text-[13px] tracking-tight">
+              <span className="text-muted-foreground">pl</span>
+              <span className="text-foreground">int</span>
             </div>
           </div>
         </div>
-        <div className="ml-2 hidden min-w-0 items-center gap-2 rounded-md border border-border bg-surface-2 px-2 py-1 text-[11px] text-muted-foreground md:flex">
-          <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-primary" />
-          <span className="truncate font-mono">
+        <div className="ml-1 hidden min-w-0 items-center gap-2 border-l border-border pl-3 font-mono text-[11px] text-muted-foreground md:flex">
+          <span className="text-primary">~</span>
+          <span className="truncate">
             {fileName ? fileName : `main${language.ext}`}
           </span>
           <span className="opacity-40">·</span>
-          <span className="truncate">{language.name}</span>
+          <span className="truncate">{language.name.toLowerCase()}</span>
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-        <button
-          onClick={onOpenFiles}
-          aria-label="Files"
-          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2 py-1.5 text-xs text-muted-foreground transition-all hover:scale-105 hover:bg-surface-3 hover:text-foreground sm:px-3"
-        >
-          <Files className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Files</span>
-        </button>
-        <button
-          onClick={onReset}
-          aria-label="Reset sample"
-          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2 py-1.5 text-xs text-muted-foreground transition-all hover:scale-105 hover:bg-surface-3 hover:text-foreground sm:px-3"
-        >
-          <RotateCcw className="h-3.5 w-3.5" />
-          <span className="hidden md:inline">Reset</span>
-        </button>
-        <button
+      <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
+        <IconButton onClick={onOpenFiles} label="Files" icon={<Files className="h-3.5 w-3.5" />} />
+        <IconButton onClick={onReset} label="Reset" icon={<RotateCcw className="h-3.5 w-3.5" />} />
+        <IconButton
           onClick={onOpenSettings}
-          aria-label="Settings"
-          className="rounded-md border border-border bg-surface-2 p-1.5 text-muted-foreground transition-all hover:rotate-45 hover:bg-surface-3 hover:text-foreground"
-        >
-          <Settings2 className="h-3.5 w-3.5" />
-        </button>
+          label="Settings"
+          icon={<Sliders className="h-3.5 w-3.5" />}
+          hideLabelOnMobile
+        />
         <button
           onClick={onRun}
           disabled={running}
-          className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 sm:px-4"
-          style={{ background: "var(--gradient-brand)" }}
+          className="ml-1 inline-flex items-center gap-2 rounded-md border border-primary/60 bg-primary/10 px-3 py-1.5 font-mono text-xs text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
         >
           {running ? (
             <>
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-foreground" />
-              <span className="hidden sm:inline">Running</span>
+              <span className="h-1.5 w-1.5 animate-blink rounded-full bg-primary" />
+              <span className="hidden sm:inline">running…</span>
             </>
           ) : (
             <>
               <Play className="h-3 w-3 fill-current" />
-              <span>Run</span>
-              <kbd className="ml-1 hidden rounded border border-primary-foreground/30 bg-primary-foreground/10 px-1 py-0.5 text-[9px] font-mono sm:inline">
+              <span>run</span>
+              <kbd className="ml-1 hidden rounded border border-primary/40 bg-primary/10 px-1 py-0.5 text-[9px] sm:inline">
                 ⌘↵
               </kbd>
             </>
@@ -96,5 +78,30 @@ export function Toolbar({
         </button>
       </div>
     </header>
+  );
+}
+
+function IconButton({
+  onClick,
+  label,
+  icon,
+  hideLabelOnMobile,
+}: {
+  onClick: () => void;
+  label: string;
+  icon: React.ReactNode;
+  hideLabelOnMobile?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2/60 px-2 py-1.5 font-mono text-[11px] text-muted-foreground hover:border-border/80 hover:bg-surface-2 hover:text-foreground sm:px-2.5"
+    >
+      {icon}
+      <span className={hideLabelOnMobile ? "hidden md:inline" : "hidden sm:inline"}>
+        {label.toLowerCase()}
+      </span>
+    </button>
   );
 }

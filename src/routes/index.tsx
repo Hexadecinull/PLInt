@@ -7,7 +7,7 @@ import { LanguageSidebar } from "@/components/LanguageSidebar";
 import { OutputPane } from "@/components/OutputPane";
 import { SyntaxGuide } from "@/components/SyntaxGuide";
 import { Toolbar } from "@/components/Toolbar";
-import { applyAccent, getSettings } from "@/lib/settings";
+import { applyAccent, applyDensity, applyMotion, getSettings } from "@/lib/settings";
 import type { SavedFile } from "@/lib/files";
 
 const FileManager = lazy(() =>
@@ -24,13 +24,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Run Python, JavaScript, TypeScript, Java, C#, PHP, SQL, Bash, PowerShell, Batch, Kotlin, Ruby, Go, Dart, C, C++, Lua, Perl and R online — no logins, no installs. Free & open source (GPL-3.0).",
+          "Run Python, JavaScript, TypeScript, Java, C#, PHP, SQL, Bash, PowerShell, Batch, Kotlin, Ruby, Go, Dart, C, C++, Rust, Swift, Zig, Haxe, Haskell, OCaml, Lua, Perl and R online — no logins, no installs. Free & open source (GPL-3.0).",
       },
       { property: "og:title", content: "PLInt — Online Interpreter Hub" },
       {
         property: "og:description",
         content:
-          "19 languages, one browser tab. Full syntax highlighting, live errors, saved files, instant execution.",
+          "25 languages, one browser tab. Full syntax highlighting, live errors, saved files, instant execution.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -75,10 +75,12 @@ function PLInt() {
     setBuffers(s.buffers ?? {});
     setCurrentFileByLang(s.currentFileByLang ?? {});
     setHydrated(true);
-    applyAccent(getSettings().accent);
+    const cfg = getSettings();
+    applyAccent(cfg.accent);
+    applyMotion(cfg.reducedMotion);
+    applyDensity(cfg.density);
   }, []);
 
-  // Debounced persistence for snappier typing.
   useEffect(() => {
     if (!hydrated) return;
     const settings = getSettings();
@@ -137,6 +139,9 @@ function PLInt() {
       } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
         e.preventDefault();
         setFilesOpen(true);
+      } else if (e.key === "Escape") {
+        setFilesOpen(false);
+        setSettingsOpen(false);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -186,7 +191,11 @@ function PLInt() {
           }}
         />
 
-        <main className="grid min-h-0 flex-1 grid-cols-1 gap-2 p-2 sm:gap-3 sm:p-3 lg:grid-cols-[1.6fr_1fr] lg:grid-rows-[1fr_auto]">
+        {/* key={lang.id} makes the workspace fade in on language switch. */}
+        <main
+          key={lang.id}
+          className="grid min-h-0 flex-1 animate-fade-in grid-cols-1 gap-2 p-2 sm:gap-3 sm:p-3 lg:grid-cols-[1.6fr_1fr] lg:grid-rows-[1fr_auto]"
+        >
           <section className="min-h-[45vh] lg:row-span-2 lg:min-h-0">
             <EditorPane language={lang} value={code} onChange={setCode} />
           </section>
@@ -204,20 +213,16 @@ function PLInt() {
       </div>
 
       <Suspense fallback={null}>
-        {filesOpen && (
-          <FileManager
-            open={filesOpen}
-            onClose={() => setFilesOpen(false)}
-            language={lang}
-            code={code}
-            currentFileId={currentFileId}
-            onLoad={handleLoad}
-            onSaved={handleSaved}
-          />
-        )}
-        {settingsOpen && (
-          <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
-        )}
+        <FileManager
+          open={filesOpen}
+          onClose={() => setFilesOpen(false)}
+          language={lang}
+          code={code}
+          currentFileId={currentFileId}
+          onLoad={handleLoad}
+          onSaved={handleSaved}
+        />
+        <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       </Suspense>
     </div>
   );

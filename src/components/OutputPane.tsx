@@ -8,50 +8,71 @@ interface Props {
 
 export function OutputPane({ running, result, onClear }: Props) {
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface">
-      <div className="flex items-center justify-between border-b border-border px-4 py-2">
+    <div className="flex h-full flex-col overflow-hidden rounded-md border border-border bg-[oklch(0.10_0.005_240)] font-mono">
+      {/* Terminal chrome */}
+      <div className="flex items-center justify-between border-b border-border bg-surface px-3 py-1.5">
         <div className="flex items-center gap-3">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            Output
+          <div className="flex items-center gap-1.5" aria-hidden>
+            <span className="h-2.5 w-2.5 rounded-full bg-destructive/70" />
+            <span className="h-2.5 w-2.5 rounded-full bg-warning/70" />
+            <span className="h-2.5 w-2.5 rounded-full bg-success/70" />
+          </div>
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            output — /bin/plint
           </span>
-          {running && <StatusBadge kind="running">running…</StatusBadge>}
+          {running && <StatusBadge kind="running">running</StatusBadge>}
           {!running && result && (
             <StatusBadge kind={result.ok ? "ok" : "err"}>
-              {result.ok ? "success" : "error"} · {result.durationMs.toFixed(0)}ms
+              {result.ok ? "exit 0" : "exit 1"} · {result.durationMs.toFixed(0)}ms
             </StatusBadge>
           )}
         </div>
         <button
           onClick={onClear}
-          className="text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+          className="text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
         >
-          Clear
+          clear
         </button>
       </div>
 
-      <div className="scroll-slim flex-1 overflow-auto p-4 font-mono text-[13px] leading-relaxed">
+      <div className="scroll-slim flex-1 overflow-auto px-3 py-2 text-[13px] leading-relaxed">
         {!result && !running && (
           <div className="text-muted-foreground">
-            <span className="text-primary">▸</span> Press{" "}
-            <kbd className="rounded border border-border bg-surface-2 px-1.5 py-0.5 text-[10px]">
+            <span className="text-terminal-green">user@plint</span>
+            <span className="text-muted-foreground">:</span>
+            <span className="text-primary">~</span>
+            <span className="text-muted-foreground">$ </span>
+            press{" "}
+            <kbd className="rounded border border-border bg-surface-2 px-1 py-0.5 text-[10px]">
               ⌘/Ctrl + Enter
             </kbd>{" "}
-            or click <span className="text-primary">Run</span> to execute your code.
+            to run
+            <span className="ml-1 inline-block h-[1em] w-[0.55em] translate-y-0.5 bg-foreground/70 animate-caret" />
+          </div>
+        )}
+
+        {(running || result) && (
+          <div className="mb-1">
+            <span className="text-terminal-green">user@plint</span>
+            <span className="text-muted-foreground">:</span>
+            <span className="text-primary">~</span>
+            <span className="text-muted-foreground">$ </span>
+            <span className="text-foreground/90">./run</span>
           </div>
         )}
 
         {result?.diagnostics && result.diagnostics.length > 0 && (
-          <div className="mb-3 space-y-1">
+          <div className="mb-2 space-y-1">
             {result.diagnostics.map((d, i) => (
               <div
                 key={i}
                 className={
-                  "rounded border px-2 py-1 text-[12px] " +
+                  "border-l-2 pl-2 text-[12px] " +
                   (d.severity === "error"
-                    ? "border-destructive/40 bg-destructive/10 text-destructive-foreground"
+                    ? "border-destructive text-destructive"
                     : d.severity === "warning"
-                    ? "border-warning/40 bg-warning/10 text-warning"
-                    : "border-border bg-surface-2 text-muted-foreground")
+                    ? "border-warning text-warning"
+                    : "border-border text-muted-foreground")
                 }
               >
                 <span className="uppercase tracking-wider text-[10px] opacity-70">
@@ -76,12 +97,20 @@ export function OutputPane({ running, result, onClear }: Props) {
           <pre className="whitespace-pre-wrap text-foreground">{result.stdout}</pre>
         )}
         {result?.stderr && (
-          <pre className="mt-2 whitespace-pre-wrap text-destructive">
-            {result.stderr}
-          </pre>
+          <pre className="mt-1 whitespace-pre-wrap text-destructive">{result.stderr}</pre>
         )}
         {result && !result.stdout && !result.stderr && !result.diagnostics.length && (
           <div className="text-muted-foreground">(no output)</div>
+        )}
+
+        {result && !running && (
+          <div className="mt-2 text-muted-foreground">
+            <span className="text-terminal-green">user@plint</span>
+            <span className="text-muted-foreground">:</span>
+            <span className="text-primary">~</span>
+            <span className="text-muted-foreground">$ </span>
+            <span className="inline-block h-[1em] w-[0.55em] translate-y-0.5 bg-foreground/70 animate-caret" />
+          </div>
         )}
       </div>
     </div>
@@ -97,16 +126,16 @@ function StatusBadge({
 }) {
   const cls =
     kind === "ok"
-      ? "border-success/40 bg-success/10 text-success"
+      ? "border-success/40 text-success"
       : kind === "err"
-      ? "border-destructive/40 bg-destructive/10 text-destructive"
-      : "border-primary/40 bg-primary/10 text-primary";
+      ? "border-destructive/40 text-destructive"
+      : "border-primary/40 text-primary";
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${cls}`}
+      className={`inline-flex items-center gap-1.5 rounded border px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${cls}`}
     >
       {kind === "running" && (
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" />
+        <span className="h-1.5 w-1.5 animate-blink rounded-full bg-current" />
       )}
       {children}
     </span>
