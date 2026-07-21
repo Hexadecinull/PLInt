@@ -3,7 +3,6 @@ import {
   Download,
   FilePlus2,
   FileUp,
-  Files,
   Pencil,
   Save,
   Trash2,
@@ -19,6 +18,7 @@ import {
   saveFile,
   type SavedFile,
 } from "@/lib/files";
+import { useAnimatedOpen } from "@/hooks/use-animated-open";
 
 interface Props {
   open: boolean;
@@ -42,6 +42,7 @@ export function FileManager({
   const [files, setFiles] = useState<SavedFile[]>([]);
   const [name, setName] = useState("");
   const [tick, setTick] = useState(0);
+  const { mounted, state } = useAnimatedOpen(open);
 
   useEffect(() => {
     if (open) setFiles(listFiles(language.id));
@@ -54,7 +55,7 @@ export function FileManager({
 
   const canSave = useMemo(() => name.trim().length > 0, [name]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   const handleSave = () => {
     if (!canSave) return;
@@ -116,59 +117,59 @@ export function FileManager({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={onClose}
+      data-state={state}
+      data-anim="overlay"
+      style={{ background: "oklch(0 0 0 / 0.65)" }}
     >
       <div
-        className="w-full max-w-2xl overflow-hidden rounded-lg border border-border bg-popover shadow-[var(--shadow-panel)] animate-scale-in"
+        className="w-full max-w-2xl overflow-hidden rounded-md border border-border bg-popover shadow-[var(--shadow-panel)]"
         onClick={(e) => e.stopPropagation()}
+        data-state={state}
+        data-anim="panel"
       >
-        <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <div className="flex items-center gap-2">
-            <Files className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-semibold">
-              {language.name} files
-            </h2>
-            <span className="rounded-full border border-border bg-surface-2 px-2 py-0.5 text-[10px] text-muted-foreground">
-              {files.length}
-            </span>
+        <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
+          <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+            <span className="text-primary">~/</span>
+            <span>{language.name.toLowerCase()}/files · {files.length}</span>
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
+            className="rounded p-1 text-muted-foreground hover:bg-surface-2 hover:text-foreground"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="grid gap-3 p-4 sm:grid-cols-[1fr_auto_auto]">
+        <div className="grid gap-2 p-4 sm:grid-cols-[1fr_auto_auto]">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="file name (e.g. fizzbuzz)"
-            className="rounded-md border border-border bg-input px-3 py-2 text-sm outline-none transition-colors focus:border-primary"
+            className="rounded-md border border-border bg-input px-3 py-1.5 font-mono text-[12px] outline-none focus:border-primary"
           />
           <button
             onClick={handleSave}
             disabled={!canSave}
-            className="inline-flex items-center gap-2 rounded-md border border-border bg-surface-2 px-3 py-2 text-xs transition-colors hover:bg-surface-3 disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-3 py-1.5 font-mono text-[11px] hover:bg-surface-3 disabled:opacity-40"
           >
-            <Save className="h-3.5 w-3.5" /> {currentFileId ? "Save" : "Create"}
+            <Save className="h-3.5 w-3.5" /> {currentFileId ? "save" : "create"}
           </button>
           <button
             onClick={handleSaveAs}
             disabled={!canSave}
-            className="inline-flex items-center gap-2 rounded-md border border-border bg-surface-2 px-3 py-2 text-xs transition-colors hover:bg-surface-3 disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-3 py-1.5 font-mono text-[11px] hover:bg-surface-3 disabled:opacity-40"
           >
-            <FilePlus2 className="h-3.5 w-3.5" /> Save as new
+            <FilePlus2 className="h-3.5 w-3.5" /> save as
           </button>
         </div>
 
         <div className="scroll-slim max-h-[50vh] overflow-y-auto border-t border-border">
           {files.length === 0 ? (
-            <div className="p-8 text-center text-xs text-muted-foreground">
-              No saved files yet for {language.name}.
+            <div className="p-8 text-center font-mono text-[11px] text-muted-foreground">
+              no saved files yet for {language.name.toLowerCase()}.
             </div>
           ) : (
             <ul className="divide-y divide-border">
@@ -178,51 +179,34 @@ export function FileManager({
                   <li
                     key={f.id}
                     className={
-                      "flex items-center gap-2 px-4 py-2 text-sm transition-colors hover:bg-surface-2 " +
+                      "flex items-center gap-2 px-4 py-1.5 font-mono text-[12px] hover:bg-surface-2 " +
                       (isCurrent ? "bg-surface-2" : "")
                     }
                   >
-                    <button
-                      onClick={() => onLoad(f)}
-                      className="flex-1 truncate text-left"
-                    >
-                      <span className="font-mono text-foreground">{f.name}</span>
+                    <span className="text-muted-foreground/50">{isCurrent ? "›" : " "}</span>
+                    <button onClick={() => onLoad(f)} className="flex-1 truncate text-left">
+                      <span className="text-foreground">{f.name}</span>
                       <span className="ml-2 text-[10px] text-muted-foreground">
                         {new Date(f.updatedAt).toLocaleString()}
                       </span>
                     </button>
-                    <button
-                      onClick={() => {
-                        const n = prompt("New name", f.name);
-                        if (n) {
-                          renameFile(f.id, n);
-                          setTick((t) => t + 1);
-                        }
-                      }}
-                      aria-label="Rename"
-                      className="rounded p-1 text-muted-foreground transition-colors hover:bg-surface-3 hover:text-foreground"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleDownload(f)}
-                      aria-label="Download"
-                      className="rounded p-1 text-muted-foreground transition-colors hover:bg-surface-3 hover:text-foreground"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                    </button>
-                    <button
+                    <IconMini onClick={() => {
+                      const n = prompt("New name", f.name);
+                      if (n) { renameFile(f.id, n); setTick((t) => t + 1); }
+                    }} label="Rename"><Pencil className="h-3.5 w-3.5" /></IconMini>
+                    <IconMini onClick={() => handleDownload(f)} label="Download"><Download className="h-3.5 w-3.5" /></IconMini>
+                    <IconMini
                       onClick={() => {
                         if (confirm(`Delete "${f.name}"?`)) {
                           deleteFile(f.id);
                           setTick((t) => t + 1);
                         }
                       }}
-                      aria-label="Delete"
-                      className="rounded p-1 text-muted-foreground transition-colors hover:bg-destructive/20 hover:text-destructive"
+                      label="Delete"
+                      danger
                     >
                       <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    </IconMini>
                   </li>
                 );
               })}
@@ -231,25 +215,47 @@ export function FileManager({
         </div>
 
         <div className="flex items-center justify-between border-t border-border px-4 py-2">
-          <div className="text-[10px] text-muted-foreground">
-            Files are stored in your browser (localStorage).
+          <div className="font-mono text-[10px] text-muted-foreground">
+            stored locally · localStorage
           </div>
           <div className="flex gap-2">
             <button
               onClick={handleImport}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 py-1 text-[11px] transition-colors hover:bg-surface-3"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 py-1 font-mono text-[10px] hover:bg-surface-3"
             >
-              <FileUp className="h-3 w-3" /> Import
+              <FileUp className="h-3 w-3" /> import
             </button>
             <button
               onClick={handleExport}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 py-1 text-[11px] transition-colors hover:bg-surface-3"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 py-1 font-mono text-[10px] hover:bg-surface-3"
             >
-              <Download className="h-3 w-3" /> Export all
+              <Download className="h-3 w-3" /> export all
             </button>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function IconMini({
+  onClick, label, danger, children,
+}: {
+  onClick: () => void;
+  label: string;
+  danger?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className={
+        "rounded p-1 text-muted-foreground " +
+        (danger ? "hover:bg-destructive/20 hover:text-destructive" : "hover:bg-surface-3 hover:text-foreground")
+      }
+    >
+      {children}
+    </button>
   );
 }

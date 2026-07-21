@@ -22,22 +22,23 @@ export function EditorPane({ language, value, onChange }: Props) {
       base: "vs-dark",
       inherit: true,
       rules: [
-        { token: "comment", foreground: "6b8299", fontStyle: "italic" },
-        { token: "keyword", foreground: "7ee6d1" },
+        { token: "comment", foreground: "5a6472", fontStyle: "italic" },
+        { token: "keyword", foreground: "b8ecdc" },
         { token: "string", foreground: "e6c98a" },
         { token: "number", foreground: "b892ff" },
         { token: "type", foreground: "7ec9ff" },
       ],
       colors: {
-        "editor.background": "#131b23",
+        "editor.background": "#0f1418",
         "editor.foreground": "#e3ecf1",
-        "editorLineNumber.foreground": "#3d5468",
-        "editorLineNumber.activeForeground": "#7ee6d1",
-        "editor.selectionBackground": "#1f3a45",
-        "editor.lineHighlightBackground": "#17222b",
-        "editorCursor.foreground": "#7ee6d1",
-        "editorIndentGuide.background1": "#1e2a34",
-        "editorIndentGuide.activeBackground1": "#2c3e4c",
+        "editorLineNumber.foreground": "#3a4550",
+        "editorLineNumber.activeForeground": "#b8ecdc",
+        "editor.selectionBackground": "#1e2f38",
+        "editor.lineHighlightBackground": "#141a20",
+        "editorCursor.foreground": "#b8ecdc",
+        "editorIndentGuide.background1": "#1a2028",
+        "editorIndentGuide.activeBackground1": "#2a3540",
+        "editorWhitespace.foreground": "#2a3540",
       },
     });
     monaco.editor.setTheme("plint-dark");
@@ -51,7 +52,7 @@ export function EditorPane({ language, value, onChange }: Props) {
   }, [language.id, ready]);
 
   return (
-    <div className="h-full w-full overflow-hidden rounded-lg border border-border bg-[oklch(0.14_0.015_240)] animate-fade-in">
+    <div className="h-full w-full overflow-hidden rounded-md border border-border bg-[oklch(0.10_0.005_240)]">
       <Editor
         height="100%"
         language={language.monaco}
@@ -59,8 +60,8 @@ export function EditorPane({ language, value, onChange }: Props) {
         onChange={(v) => onChange(v ?? "")}
         onMount={onMount}
         loading={
-          <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+          <div className="flex h-full items-center justify-center font-mono text-xs text-muted-foreground">
+            <span className="h-1.5 w-1.5 animate-blink rounded-full bg-primary" />
             <span className="ml-2">loading editor…</span>
           </div>
         }
@@ -74,9 +75,15 @@ export function EditorPane({ language, value, onChange }: Props) {
           tabSize: settings.tabSize,
           smoothScrolling: true,
           cursorSmoothCaretAnimation: "on",
+          cursorStyle: settings.cursorStyle,
+          cursorBlinking: settings.cursorBlinking,
+          renderWhitespace: settings.showWhitespace ? "all" : "none",
+          bracketPairColorization: { enabled: settings.bracketColorization },
+          stickyScroll: { enabled: settings.stickyScroll },
+          guides: { indentation: settings.indentGuides, bracketPairs: settings.bracketColorization },
           scrollBeyondLastLine: false,
-          padding: { top: 16, bottom: 16 },
-          renderLineHighlight: "all",
+          padding: { top: 12, bottom: 12 },
+          renderLineHighlight: "line",
           automaticLayout: true,
         }}
       />

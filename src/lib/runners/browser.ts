@@ -86,7 +86,8 @@ export async function runTs(code: string): Promise<RunResult> {
       module: ts.ModuleKind.ESNext,
       strict: false,
       esModuleInterop: true,
-      jsx: ts.JsxEmit.None,
+      // Intentionally omit `jsx` — leaving it unset avoids
+      // `Argument for '--jsx' option must be: ...` on some TS builds.
     },
     reportDiagnostics: true,
   });
