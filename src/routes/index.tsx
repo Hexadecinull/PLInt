@@ -68,6 +68,10 @@ function PLInt() {
   const [hydrated, setHydrated] = useState(false);
   const [filesOpen, setFilesOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [filesEverOpened, setFilesEverOpened] = useState(false);
+  const [settingsEverOpened, setSettingsEverOpened] = useState(false);
+  useEffect(() => { if (filesOpen) setFilesEverOpened(true); }, [filesOpen]);
+  useEffect(() => { if (settingsOpen) setSettingsEverOpened(true); }, [settingsOpen]);
 
   useEffect(() => {
     const s = loadState();
