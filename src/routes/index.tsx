@@ -217,16 +217,20 @@ function PLInt() {
       </div>
 
       <Suspense fallback={null}>
-        <FileManager
-          open={filesOpen}
-          onClose={() => setFilesOpen(false)}
-          language={lang}
-          code={code}
-          currentFileId={currentFileId}
-          onLoad={handleLoad}
-          onSaved={handleSaved}
-        />
-        <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+        {filesEverOpened && (
+          <FileManager
+            open={filesOpen}
+            onClose={() => setFilesOpen(false)}
+            language={lang}
+            code={code}
+            currentFileId={currentFileId}
+            onLoad={handleLoad}
+            onSaved={handleSaved}
+          />
+        )}
+        {settingsEverOpened && (
+          <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+        )}
       </Suspense>
     </div>
   );
