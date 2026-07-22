@@ -194,7 +194,7 @@ function PLInt() {
       <div className="flex min-h-0 flex-1">
         {/* Desktop: resizable layout with collapsible sidebar. */}
         <div className="hidden min-h-0 flex-1 md:flex">
-          <Group direction="horizontal" className="flex min-h-0 flex-1">
+          <Group orientation="horizontal" className="flex min-h-0 flex-1">
             {!sidebarCollapsed && (
               <>
                 <Panel defaultSize="16%" minSize="10%" maxSize="30%" className="min-h-0">
@@ -208,9 +208,9 @@ function PLInt() {
               </>
             )}
             <Panel minSize="30%" className="min-h-0">
-              <Group direction="vertical" className="flex min-h-0 flex-1 flex-col">
+              <Group orientation="vertical" className="flex min-h-0 flex-1 flex-col">
                 <Panel defaultSize="70%" minSize="20%" className="min-h-0">
-                  <Group direction="horizontal" className="flex min-h-0 flex-1 p-2">
+                  <Group orientation="horizontal" className="flex min-h-0 flex-1 p-2">
                     <Panel defaultSize="60%" minSize="20%" className="min-h-0">
                       <EditorPane language={lang} value={code} onChange={setCode} />
                     </Panel>
