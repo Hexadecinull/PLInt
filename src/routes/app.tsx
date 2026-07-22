@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { Group, Panel, Separator } from "react-resizable-panels";
 import { LANG_BY_ID, type LanguageDef } from "@/lib/languages";
 import { runCode, type RunResult } from "@/lib/runners";
 import { EditorPane } from "@/components/EditorPane";
@@ -194,43 +194,39 @@ function PLInt() {
       <div className="flex min-h-0 flex-1">
         {/* Desktop: resizable layout with collapsible sidebar. */}
         <div className="hidden min-h-0 flex-1 md:flex">
-          <PanelGroup
-            direction="horizontal"
-            autoSaveId={`${LAYOUT_KEY}.h`}
-            className="min-h-0 flex-1"
-          >
+          <Group direction="horizontal" className="flex min-h-0 flex-1">
             {!sidebarCollapsed && (
               <>
-                <Panel defaultSize={16} minSize={10} maxSize={30} className="min-h-0">
+                <Panel defaultSize="16%" minSize="10%" maxSize="30%" className="min-h-0">
                   <LanguageSidebar
                     languages={langs}
                     active={lang.id}
                     onSelect={(l) => { setActive(l.id); setResult(null); }}
                   />
                 </Panel>
-                <PanelResizeHandle className="w-1 bg-border/60 transition-colors hover:bg-primary/60" />
+                <Separator className="w-1 bg-border/60 transition-colors hover:bg-primary/60" />
               </>
             )}
-            <Panel minSize={30} className="min-h-0">
-              <PanelGroup direction="vertical" autoSaveId={`${LAYOUT_KEY}.v`}>
-                <Panel defaultSize={70} minSize={20} className="min-h-0">
-                  <PanelGroup direction="horizontal" autoSaveId={`${LAYOUT_KEY}.eo`} className="p-2">
-                    <Panel defaultSize={60} minSize={20} className="min-h-0">
+            <Panel minSize="30%" className="min-h-0">
+              <Group direction="vertical" className="flex min-h-0 flex-1 flex-col">
+                <Panel defaultSize="70%" minSize="20%" className="min-h-0">
+                  <Group direction="horizontal" className="flex min-h-0 flex-1 p-2">
+                    <Panel defaultSize="60%" minSize="20%" className="min-h-0">
                       <EditorPane language={lang} value={code} onChange={setCode} />
                     </Panel>
-                    <PanelResizeHandle className="mx-1 w-1 bg-border/60 transition-colors hover:bg-primary/60" />
-                    <Panel defaultSize={40} minSize={20} className="min-h-0">
+                    <Separator className="mx-1 w-1 bg-border/60 transition-colors hover:bg-primary/60" />
+                    <Panel defaultSize="40%" minSize="20%" className="min-h-0">
                       <OutputPane running={running} result={result} onClear={() => setResult(null)} />
                     </Panel>
-                  </PanelGroup>
+                  </Group>
                 </Panel>
-                <PanelResizeHandle className="h-1 bg-border/60 transition-colors hover:bg-primary/60" />
-                <Panel defaultSize={30} minSize={10} className="min-h-0 p-2 pt-0">
+                <Separator className="h-1 bg-border/60 transition-colors hover:bg-primary/60" />
+                <Panel defaultSize="30%" minSize="10%" className="min-h-0 p-2 pt-0">
                   <SyntaxGuide lang={lang} />
                 </Panel>
-              </PanelGroup>
+              </Group>
             </Panel>
-          </PanelGroup>
+          </Group>
         </div>
 
         {/* Mobile: stacked layout with drawer sidebar. */}
