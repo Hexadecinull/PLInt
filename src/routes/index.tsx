@@ -1,21 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { LANGUAGES, LANG_BY_ID, type LanguageDef } from "@/lib/languages";
-import { runCode, type RunResult } from "@/lib/runners";
-import { EditorPane } from "@/components/EditorPane";
-import { LanguageSidebar } from "@/components/LanguageSidebar";
-import { OutputPane } from "@/components/OutputPane";
-import { SyntaxGuide } from "@/components/SyntaxGuide";
-import { Toolbar } from "@/components/Toolbar";
-import { applyAccent, applyDensity, applyMotion, getSettings } from "@/lib/settings";
-import type { SavedFile } from "@/lib/files";
-
-const FileManager = lazy(() =>
-  import("@/components/FileManager").then((m) => ({ default: m.FileManager }))
-);
-const SettingsPanel = lazy(() =>
-  import("@/components/SettingsPanel").then((m) => ({ default: m.SettingsPanel }))
-);
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Terminal, ArrowRight, Github } from "lucide-react";
+import { ALL_LANGUAGES, LANGUAGES } from "@/lib/languages";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,214 +9,136 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Run Python, JavaScript, TypeScript, Java, C#, PHP, SQL, Bash, PowerShell, Batch, Kotlin, Ruby, Go, Dart, C, C++, Rust, Swift, Zig, Haxe, Haskell, OCaml, Lua, Perl and R online — no logins, no installs. Free & open source (GPL-3.0).",
+          "Run 30+ programming languages online — Python, JavaScript, TypeScript, Java, C#, F#, Rust, Go, Ruby, Swift, Julia, Elixir, Nim, HTML and more. No accounts, no installs. Open source (GPL-3.0).",
       },
       { property: "og:title", content: "PLInt — Online Interpreter Hub" },
       {
         property: "og:description",
         content:
-          "25 languages, one browser tab. Full syntax highlighting, live errors, saved files, instant execution.",
+          "One tab. 30+ languages. Full syntax highlighting, live errors, saved files, instant execution.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: PLInt,
+  component: Welcome,
 });
 
-const STORAGE_KEY = "plint.state.v1";
-
-interface PersistedState {
-  active: string;
-  buffers: Record<string, string>;
-  currentFileByLang?: Record<string, string | null>;
-}
-
-function loadState(): PersistedState {
-  if (typeof window === "undefined") return { active: "python", buffers: {} };
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { active: "python", buffers: {} };
-    return JSON.parse(raw);
-  } catch {
-    return { active: "python", buffers: {} };
-  }
-}
-
-function PLInt() {
-  const [active, setActive] = useState<string>("python");
-  const [buffers, setBuffers] = useState<Record<string, string>>({});
-  const [currentFileByLang, setCurrentFileByLang] = useState<Record<string, string | null>>({});
-  const [fileNameByLang, setFileNameByLang] = useState<Record<string, string>>({});
-  const [result, setResult] = useState<RunResult | null>(null);
-  const [running, setRunning] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
-  const [filesOpen, setFilesOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [filesEverOpened, setFilesEverOpened] = useState(false);
-  const [settingsEverOpened, setSettingsEverOpened] = useState(false);
-  useEffect(() => { if (filesOpen) setFilesEverOpened(true); }, [filesOpen]);
-  useEffect(() => { if (settingsOpen) setSettingsEverOpened(true); }, [settingsOpen]);
-
-  useEffect(() => {
-    const s = loadState();
-    setActive(s.active in LANG_BY_ID ? s.active : "python");
-    setBuffers(s.buffers ?? {});
-    setCurrentFileByLang(s.currentFileByLang ?? {});
-    setHydrated(true);
-    const cfg = getSettings();
-    applyAccent(cfg.accent);
-    applyMotion(cfg.reducedMotion);
-    applyDensity(cfg.density);
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    const settings = getSettings();
-    if (!settings.autoSave) return;
-    const t = setTimeout(() => {
-      try {
-        window.localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify({ active, buffers, currentFileByLang } satisfies PersistedState)
-        );
-      } catch {
-        /* quota */
-      }
-    }, 400);
-    return () => clearTimeout(t);
-  }, [active, buffers, currentFileByLang, hydrated]);
-
-  const lang: LanguageDef = LANG_BY_ID[active] ?? LANGUAGES[0];
-  const code = useMemo(() => buffers[lang.id] ?? lang.sample, [buffers, lang]);
-  const currentFileId = currentFileByLang[lang.id] ?? null;
-  const currentFileName = currentFileId ? fileNameByLang[lang.id] ?? null : null;
-
-  const setCode = useCallback(
-    (v: string) => setBuffers((b) => ({ ...b, [lang.id]: v })),
-    [lang.id]
-  );
-
-  const run = useCallback(async () => {
-    if (running) return;
-    setRunning(true);
-    setResult(null);
-    try {
-      const r = await runCode(lang, code);
-      setResult(r);
-    } catch (e) {
-      setResult({
-        stdout: "",
-        stderr: (e as Error).message,
-        diagnostics: [],
-        durationMs: 0,
-        ok: false,
-      });
-    } finally {
-      setRunning(false);
-    }
-  }, [code, lang, running]);
-
-  const runRef = useRef(run);
-  runRef.current = run;
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-        e.preventDefault();
-        runRef.current();
-      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
-        e.preventDefault();
-        setFilesOpen(true);
-      } else if (e.key === "Escape") {
-        setFilesOpen(false);
-        setSettingsOpen(false);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
-  const resetSample = () => {
-    setBuffers((b) => {
-      const next = { ...b };
-      delete next[lang.id];
-      return next;
-    });
-    setCurrentFileByLang((m) => ({ ...m, [lang.id]: null }));
-  };
-
-  const handleLoad = (file: SavedFile) => {
-    setActive(file.languageId);
-    setBuffers((b) => ({ ...b, [file.languageId]: file.code }));
-    setCurrentFileByLang((m) => ({ ...m, [file.languageId]: file.id }));
-    setFileNameByLang((m) => ({ ...m, [file.languageId]: file.name }));
-    setFilesOpen(false);
-  };
-
-  const handleSaved = (file: SavedFile) => {
-    setCurrentFileByLang((m) => ({ ...m, [file.languageId]: file.id }));
-    setFileNameByLang((m) => ({ ...m, [file.languageId]: file.name }));
-  };
-
+function Welcome() {
   return (
-    <div className="relative flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground">
-      <Toolbar
-        language={lang}
-        running={running}
-        fileName={currentFileName}
-        onRun={run}
-        onReset={resetSample}
-        onOpenFiles={() => setFilesOpen(true)}
-        onOpenSettings={() => setSettingsOpen(true)}
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-background text-foreground">
+      {/* subtle grid */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        style={{
+          backgroundImage:
+            "linear-gradient(var(--color-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-border) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[60vh]"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 0%, color-mix(in oklab, var(--primary) 25%, transparent) 0%, transparent 70%)",
+        }}
       />
 
-      <div className="flex min-h-0 flex-1">
-        <LanguageSidebar
-          active={lang.id}
-          onSelect={(l) => {
-            setActive(l.id);
-            setResult(null);
-          }}
-        />
+      <header className="relative z-10 flex items-center justify-between border-b border-border/60 bg-background/50 px-4 py-3 backdrop-blur sm:px-8">
+        <div className="flex items-center gap-2 font-mono text-sm">
+          <span className="grid h-7 w-7 place-items-center rounded border border-border bg-surface-2 text-primary">
+            <Terminal className="h-3.5 w-3.5" />
+          </span>
+          <span className="tracking-tight">
+            <span className="text-muted-foreground">PL</span>
+            <span className="text-foreground">Int</span>
+          </span>
+        </div>
+        <div className="flex items-center gap-3 font-mono text-[11px] text-muted-foreground">
+          <a
+            href="https://www.gnu.org/licenses/gpl-3.0.html"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-foreground"
+          >
+            GPL-3.0
+          </a>
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Source"
+            className="hover:text-foreground"
+          >
+            <Github className="h-4 w-4" />
+          </a>
+        </div>
+      </header>
 
-        {/* key={lang.id} makes the workspace fade in on language switch. */}
-        <main
-          key={lang.id}
-          className="grid min-h-0 flex-1 animate-fade-in grid-cols-1 gap-2 p-2 sm:gap-3 sm:p-3 lg:grid-cols-[1.6fr_1fr] lg:grid-rows-[1fr_auto]"
+      <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6 py-14 text-center animate-fade-in">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-border bg-surface-2/70 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <span className="h-1.5 w-1.5 rounded-full bg-terminal-green animate-blink" />
+          {ALL_LANGUAGES.length} languages · one browser tab
+        </div>
+
+        <h1 className="max-w-3xl text-balance font-mono text-4xl font-medium tracking-tight sm:text-6xl">
+          Run any language,
+          <span className="block brand-gradient-text">without installing one.</span>
+        </h1>
+
+        <p className="mt-5 max-w-2xl text-balance font-mono text-sm leading-relaxed text-muted-foreground sm:text-base">
+          PLInt is a fully online interpreter hub for {LANGUAGES.length}+ programming
+          languages — from Python and TypeScript to Rust, Haskell, Julia and Nix.
+          Full syntax highlighting, live errors, saved files. No accounts. No installs.
+        </p>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            to="/app"
+            className="group inline-flex items-center gap-2 rounded-md border border-primary/60 bg-primary/15 px-5 py-2.5 font-mono text-sm text-primary shadow-[var(--shadow-glow)] hover:bg-primary/25"
+          >
+            Launch PLInt
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+          <a
+            href="#languages"
+            className="inline-flex items-center gap-2 rounded-md border border-border bg-surface-2/70 px-5 py-2.5 font-mono text-sm text-muted-foreground hover:text-foreground"
+          >
+            View languages
+          </a>
+        </div>
+
+        <div id="languages" className="mt-16 w-full max-w-4xl">
+          <div className="mb-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            — Supported languages
+          </div>
+          <div className="flex flex-wrap justify-center gap-1.5">
+            {LANGUAGES.map((l) => (
+              <span
+                key={l.id}
+                className="rounded border border-border bg-surface-2/60 px-2.5 py-1 font-mono text-[11px] text-foreground/80"
+              >
+                {l.name}
+                <span className="ml-1.5 text-muted-foreground/60">{l.ext}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      <footer className="relative z-10 border-t border-border/60 px-4 py-3 text-center font-mono text-[10px] text-muted-foreground sm:px-8">
+        © {new Date().getFullYear()} PLInt · Free & open source ·{" "}
+        <a
+          className="text-primary hover:underline"
+          href="https://www.gnu.org/licenses/gpl-3.0.html"
+          target="_blank"
+          rel="noreferrer"
         >
-          <section className="min-h-[45vh] lg:row-span-2 lg:min-h-0">
-            <EditorPane language={lang} value={code} onChange={setCode} />
-          </section>
-          <section className="min-h-[25vh] lg:min-h-0">
-            <OutputPane
-              running={running}
-              result={result}
-              onClear={() => setResult(null)}
-            />
-          </section>
-          <section className="min-h-0 max-h-64">
-            <SyntaxGuide lang={lang} />
-          </section>
-        </main>
-      </div>
-
-      <Suspense fallback={null}>
-        {filesEverOpened && (
-          <FileManager
-            open={filesOpen}
-            onClose={() => setFilesOpen(false)}
-            language={lang}
-            code={code}
-            currentFileId={currentFileId}
-            onLoad={handleLoad}
-            onSaved={handleSaved}
-          />
-        )}
-        {settingsEverOpened && (
-          <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
-        )}
-      </Suspense>
+          GPL-3.0 License
+        </a>
+      </footer>
     </div>
   );
 }

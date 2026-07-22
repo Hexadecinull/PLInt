@@ -35,6 +35,18 @@ export function OutputPane({ running, result, onClear }: Props) {
         </button>
       </div>
 
+      {/* Optional HTML preview (for HTML runtime) */}
+      {result?.html !== undefined && (
+        <div className="border-b border-border bg-white">
+          <iframe
+            title="HTML preview"
+            srcDoc={result.html}
+            sandbox="allow-scripts allow-modals allow-forms"
+            className="h-56 w-full"
+          />
+        </div>
+      )}
+
       <div className="scroll-slim flex-1 overflow-auto px-3 py-2 text-[13px] leading-relaxed">
         {!result && !running && (
           <div className="text-muted-foreground">
@@ -44,7 +56,7 @@ export function OutputPane({ running, result, onClear }: Props) {
             <span className="text-muted-foreground">$ </span>
             press{" "}
             <kbd className="rounded border border-border bg-surface-2 px-1 py-0.5 text-[10px]">
-              ⌘/Ctrl + Enter
+              Ctrl + Enter
             </kbd>{" "}
             to run
             <span className="ml-1 inline-block h-[1em] w-[0.55em] translate-y-0.5 bg-foreground/70 animate-caret" />
@@ -99,7 +111,7 @@ export function OutputPane({ running, result, onClear }: Props) {
         {result?.stderr && (
           <pre className="mt-1 whitespace-pre-wrap text-destructive">{result.stderr}</pre>
         )}
-        {result && !result.stdout && !result.stderr && !result.diagnostics.length && (
+        {result && !result.stdout && !result.stderr && !result.diagnostics.length && !result.html && (
           <div className="text-muted-foreground">(no output)</div>
         )}
 

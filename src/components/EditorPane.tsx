@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import Editor, { type OnMount } from "@monaco-editor/react";
+import Editor, { type BeforeMount, type OnMount } from "@monaco-editor/react";
 import type { LanguageDef } from "@/lib/languages";
 import { useSettings } from "@/lib/settings";
+import { registerCustomLanguages } from "@/lib/monaco-languages";
 
 interface Props {
   language: LanguageDef;
@@ -15,9 +16,8 @@ export function EditorPane({ language, value, onChange }: Props) {
   const [ready, setReady] = useState(false);
   const [settings] = useSettings();
 
-  const onMount: OnMount = (editor, monaco) => {
-    editorRef.current = editor;
-    monacoRef.current = monaco;
+  const beforeMount: BeforeMount = (monaco) => {
+    registerCustomLanguages(monaco);
     monaco.editor.defineTheme("plint-dark", {
       base: "vs-dark",
       inherit: true,
@@ -27,6 +27,7 @@ export function EditorPane({ language, value, onChange }: Props) {
         { token: "string", foreground: "e6c98a" },
         { token: "number", foreground: "b892ff" },
         { token: "type", foreground: "7ec9ff" },
+        { token: "variable", foreground: "e3ecf1" },
       ],
       colors: {
         "editor.background": "#0f1418",
@@ -41,6 +42,11 @@ export function EditorPane({ language, value, onChange }: Props) {
         "editorWhitespace.foreground": "#2a3540",
       },
     });
+  };
+
+  const onMount: OnMount = (editor, monaco) => {
+    editorRef.current = editor;
+    monacoRef.current = monaco;
     monaco.editor.setTheme("plint-dark");
     setReady(true);
   };
@@ -58,6 +64,7 @@ export function EditorPane({ language, value, onChange }: Props) {
         language={language.monaco}
         value={value}
         onChange={(v) => onChange(v ?? "")}
+        beforeMount={beforeMount}
         onMount={onMount}
         loading={
           <div className="flex h-full items-center justify-center font-mono text-xs text-muted-foreground">

@@ -1,22 +1,25 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { LANGUAGES, type LanguageDef } from "@/lib/languages";
+import type { LanguageDef } from "@/lib/languages";
 import { useAnimatedOpen } from "@/hooks/use-animated-open";
 
 interface Props {
+  languages: LanguageDef[];
   active: string;
   onSelect: (lang: LanguageDef) => void;
 }
 
-export function LanguageSidebar({ active, onSelect }: Props) {
+export function LanguageSidebar({ languages, active, onSelect }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { mounted, state } = useAnimatedOpen(mobileOpen);
-  const activeLang = LANGUAGES.find((l) => l.id === active);
+  const activeLang = languages.find((l) => l.id === active);
 
   const list = (
     <nav className="scroll-slim flex-1 overflow-y-auto py-1">
-      {LANGUAGES.map((l) => {
+      {languages.map((l) => {
         const isActive = l.id === active;
+        const badge =
+          l.group === "esoteric" ? "eso" : l.group === "weird" ? "weird" : null;
         return (
           <button
             key={l.id}
@@ -37,7 +40,12 @@ export function LanguageSidebar({ active, onSelect }: Props) {
             >
               {isActive ? "›" : " "}
             </span>
-            <span className="flex-1 truncate">{l.name.toLowerCase()}</span>
+            <span className="flex-1 truncate">{l.name}</span>
+            {badge && (
+              <span className="rounded border border-border/70 px-1 text-[9px] uppercase tracking-wider text-muted-foreground/70">
+                {badge}
+              </span>
+            )}
             <span className="text-[10px] text-muted-foreground/50">{l.ext}</span>
           </button>
         );
@@ -54,26 +62,26 @@ export function LanguageSidebar({ active, onSelect }: Props) {
         aria-label="Open language picker"
       >
         <Menu className="h-3.5 w-3.5 text-primary" />
-        <span>{activeLang?.name.toLowerCase() ?? "languages"}</span>
+        <span>{activeLang?.name ?? "Languages"}</span>
       </button>
 
       {/* Desktop sidebar */}
-      <aside className="hidden h-full w-52 shrink-0 flex-col border-r border-border bg-surface md:flex">
+      <aside className="hidden h-full w-full shrink-0 flex-col border-r border-border bg-surface md:flex">
         <div className="border-b border-border px-3 py-2">
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            languages · {LANGUAGES.length}
+            Languages · {languages.length}
           </div>
         </div>
         {list}
         <div className="border-t border-border px-3 py-2 font-mono text-[10px] leading-relaxed text-muted-foreground">
-          gpl-3.0 ·{" "}
+          GPL-3.0 ·{" "}
           <a
             href="https://www.gnu.org/licenses/gpl-3.0.html"
             target="_blank"
             rel="noreferrer"
             className="text-primary hover:underline"
           >
-            license
+            License
           </a>
         </div>
       </aside>
@@ -95,7 +103,7 @@ export function LanguageSidebar({ active, onSelect }: Props) {
           >
             <div className="flex items-center justify-between border-b border-border px-3 py-2">
               <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                languages
+                Languages
               </div>
               <button
                 onClick={() => setMobileOpen(false)}

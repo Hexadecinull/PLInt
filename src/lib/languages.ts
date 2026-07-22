@@ -1,6 +1,4 @@
 // Language catalog for PLInt.
-// Ordered by category (scripting → web → JVM → .NET → mobile → systems →
-// functional → data/shell) so the sidebar isn't a random jumble.
 
 export type RuntimeKind =
   | "js"
@@ -10,7 +8,11 @@ export type RuntimeKind =
   | "sql"
   | "ruby"
   | "php"
+  | "html"
+  | "brainfuck"
   | "server";
+
+export type LanguageGroup = "core" | "weird" | "esoteric";
 
 export interface LanguageDef {
   id: string;
@@ -20,6 +22,7 @@ export interface LanguageDef {
   serverId?: string;
   ext: string;
   sample: string;
+  group?: LanguageGroup;
   syntax: {
     comment: string;
     variable: string;
@@ -105,6 +108,13 @@ class Program {
 }
 `;
 
+const fsharp = `// F# — PLInt
+[<EntryPoint>]
+let main _ =
+    for i in 0 .. 2 do printfn "Hello #%d" i
+    0
+`;
+
 const swift = `// Swift — PLInt
 for i in 0..<3 {
   print("Hello #\\(i)")
@@ -150,6 +160,18 @@ pub fn main() !void {
 }
 `;
 
+const nim = `# Nim — PLInt
+for i in 0..2:
+  echo "Hello #", i
+`;
+
+const nix = `# Nix — PLInt
+let
+  greet = name: "Hello, \${name}!";
+in
+  builtins.map (i: greet ("world #" + toString i)) [0 1 2]
+`;
+
 const go = `// Go — PLInt
 package main
 import "fmt"
@@ -168,6 +190,16 @@ let () =
   for i = 0 to 2 do
     Printf.printf "Hello #%d\\n" i
   done
+`;
+
+const elixir = `# Elixir — PLInt
+for i <- 0..2, do: IO.puts("Hello ##{i}")
+`;
+
+const julia = `# Julia — PLInt
+for i in 0:2
+  println("Hello #", i)
+end
 `;
 
 const haxe = `// Haxe — PLInt
@@ -200,9 +232,83 @@ REM Batch — PLInt
 for /L %%i in (1,1,3) do echo Hello #%%i
 `;
 
+const html = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>PLInt — HTML</title>
+    <style>
+      body { font-family: system-ui, sans-serif; background: #0f1418; color: #e3ecf1; padding: 2rem; }
+      h1 { color: #b8ecdc; }
+    </style>
+  </head>
+  <body>
+    <h1>Hello, world!</h1>
+    <p>Live HTML preview powered by PLInt.</p>
+    <button onclick="alert('It works!')">Click me</button>
+  </body>
+</html>
+`;
+
+// --- weird ---
+const svelte = `<!-- Svelte — PLInt -->
+<script>
+  let count = 0;
+</script>
+<button on:click={() => count += 1}>
+  Clicked {count} times
+</button>
+`;
+
+const smali = `# Smali — PLInt
+.class public LHello;
+.super Ljava/lang/Object;
+
+.method public static main([Ljava/lang/String;)V
+    .registers 2
+    sget-object v0, Ljava/lang/System;->out:Ljava/io/PrintStream;
+    const-string v1, "Hello, world!"
+    invoke-virtual {v0, v1}, Ljava/io/PrintStream;->println(Ljava/lang/String;)V
+    return-void
+.end method
+`;
+
+// --- esoteric ---
+const brainfuck = `++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.
+`;
+
+const malbolge = `('&%:9]!~}|z2Vxwv-,POqponl$Hjig%eB@@>}=<M:9wv6WsU2T|nm-,jcL(I&%$#"
+\`CB]V?Tx<uVtT\`Rpo3NlF.Jh++FdbCBA@?]!~|4XzyTT43Qsqq(Lnmkj"Fhg\${z@>
+`;
+
+const lolcode = `HAI 1.4
+  I HAS A NUM ITZ 0
+  IM IN YR LOOP UPPIN YR NUM WILE BOTH SAEM NUM AN SMALLR OF NUM AN 2
+    VISIBLE SMOOSH "Hello #" NUM MKAY
+  IM OUTTA YR LOOP
+KTHXBYE
+`;
+
+const shakespeare = `The Infamous Hello World Program.
+
+Romeo, a young man with a remarkable patience.
+Juliet, a likewise young woman of remarkable grace.
+
+                    Act I: Hamlet's insults and flattery.
+
+                    Scene I: The insulting of Romeo.
+
+[Enter Romeo and Juliet]
+
+Juliet:
+ You are as lovely as a summer's day! Speak your mind!
+
+[Exeunt]
+`;
+
 // ---------------- catalog ----------------
 
-export const LANGUAGES: LanguageDef[] = [
+const CORE: LanguageDef[] = [
   // --- scripting / dynamic ---
   {
     id: "python", name: "Python", monaco: "python", runtime: "python",
@@ -230,12 +336,27 @@ export const LANGUAGES: LanguageDef[] = [
     syntax: { comment: "# comment", variable: "x <- 10", fn: "f <- function(x) ...", io: "cat(x)", loop: "for (i in 1:n) { ... }", conditional: "if (x > 0) { ... }" },
   },
   {
+    id: "julia", name: "Julia", monaco: "julia", runtime: "server", serverId: "julia",
+    ext: ".jl", sample: julia,
+    syntax: { comment: "# comment", variable: "x = 10", fn: "function f(x) ... end", io: "println(x)", loop: "for i in 1:n ... end", conditional: "if x > 0 ... end" },
+  },
+  {
+    id: "elixir", name: "Elixir", monaco: "elixir", runtime: "server", serverId: "elixir",
+    ext: ".exs", sample: elixir,
+    syntax: { comment: "# comment", variable: "x = 10", fn: "def f(x), do: ...", io: "IO.puts(x)", loop: "Enum.each(list, fn i -> ... end)", conditional: "if x > 0 do ... end" },
+  },
+  {
     id: "php", name: "PHP", monaco: "php", runtime: "php",
     ext: ".php", sample: php,
     syntax: { comment: "// comment", variable: "$x = 10;", fn: "function f($x) { ... }", io: "echo $x;", loop: "for ($i=0; $i<$n; $i++)", conditional: "if ($x > 0) { ... }" },
   },
 
   // --- web ---
+  {
+    id: "html", name: "HTML", monaco: "html", runtime: "html",
+    ext: ".html", sample: html,
+    syntax: { comment: "<!-- comment -->", variable: "<div id=\"x\">…</div>", fn: "<script>function f(){}</script>", io: "document.write(x)", loop: "for (…) …", conditional: "if (…) …" },
+  },
   {
     id: "javascript", name: "JavaScript", monaco: "javascript", runtime: "js",
     ext: ".js", sample: js,
@@ -264,6 +385,11 @@ export const LANGUAGES: LanguageDef[] = [
     id: "csharp", name: "C#", monaco: "csharp", runtime: "server", serverId: "csharp",
     ext: ".cs", sample: cs,
     syntax: { comment: "// comment", variable: "int x = 10;", fn: "int F(int x) => ...;", io: "Console.WriteLine(x);", loop: "for (int i = 0; i < n; i++)", conditional: "if (x > 0) { ... }" },
+  },
+  {
+    id: "fsharp", name: "F#", monaco: "fsharp", runtime: "server", serverId: "fsharp",
+    ext: ".fs", sample: fsharp,
+    syntax: { comment: "// comment", variable: "let x = 10", fn: "let f x = ...", io: "printfn \"%d\" x", loop: "for i in 0 .. n do ...", conditional: "if x > 0 then ... else ..." },
   },
 
   // --- mobile / cross-platform ---
@@ -305,6 +431,11 @@ export const LANGUAGES: LanguageDef[] = [
     syntax: { comment: "// comment", variable: "const x: i32 = 10;", fn: "fn f(x: i32) i32 { ... }", io: "std.debug.print(\"{}\", .{x});", loop: "while (i < n) : (i += 1)", conditional: "if (x > 0) { ... }" },
   },
   {
+    id: "nim", name: "Nim", monaco: "nim", runtime: "server", serverId: "nim",
+    ext: ".nim", sample: nim,
+    syntax: { comment: "# comment", variable: "var x = 10", fn: "proc f(x: int): int = ...", io: "echo x", loop: "for i in 0..n: ...", conditional: "if x > 0: ..." },
+  },
+  {
     id: "go", name: "Go", monaco: "go", runtime: "server", serverId: "go",
     ext: ".go", sample: go,
     syntax: { comment: "// comment", variable: "x := 10", fn: "func f(x int) int { ... }", io: "fmt.Println(x)", loop: "for i := 0; i < n; i++", conditional: "if x > 0 { ... }" },
@@ -320,6 +451,13 @@ export const LANGUAGES: LanguageDef[] = [
     id: "ocaml", name: "OCaml", monaco: "ocaml", runtime: "server", serverId: "ocaml",
     ext: ".ml", sample: ocaml,
     syntax: { comment: "(* comment *)", variable: "let x = 10", fn: "let f x = ...", io: "print_int x", loop: "for i = 0 to n do ... done", conditional: "if x > 0 then ... else ..." },
+  },
+
+  // --- config / niche ---
+  {
+    id: "nix", name: "Nix", monaco: "nix", runtime: "server", serverId: "nix",
+    ext: ".nix", sample: nix,
+    syntax: { comment: "# comment", variable: "let x = 10; in ...", fn: "f = x: ...;", io: "builtins.trace x null", loop: "map (i: ...) list", conditional: "if x > 0 then ... else ..." },
   },
 
   // --- data / shell ---
@@ -345,4 +483,44 @@ export const LANGUAGES: LanguageDef[] = [
   },
 ];
 
-export const LANG_BY_ID = Object.fromEntries(LANGUAGES.map((l) => [l.id, l]));
+export const WEIRD: LanguageDef[] = [
+  {
+    id: "svelte", name: "Svelte", monaco: "svelte", runtime: "server", serverId: "svelte",
+    ext: ".svelte", sample: svelte, group: "weird",
+    syntax: { comment: "<!-- comment -->", variable: "let x = 10;", fn: "function f() {}", io: "{x}", loop: "{#each xs as x} ... {/each}", conditional: "{#if x} ... {/if}" },
+  },
+  {
+    id: "smali", name: "Smali", monaco: "smali", runtime: "server", serverId: "smali",
+    ext: ".smali", sample: smali, group: "weird",
+    syntax: { comment: "# comment", variable: ".local v0", fn: ".method public foo()V", io: "invoke-virtual …println(…)", loop: ":goto_0 … goto :goto_0", conditional: "if-eqz v0, :cond_0" },
+  },
+];
+
+export const ESOTERIC: LanguageDef[] = [
+  {
+    id: "brainfuck", name: "Brainfuck", monaco: "brainfuck", runtime: "brainfuck",
+    ext: ".bf", sample: brainfuck, group: "esoteric",
+    syntax: { comment: "(anything not +-<>[].,)", variable: "cell (30k tape)", fn: "n/a", io: ". , (out / in)", loop: "[ … ]", conditional: "[ … ] (skip if zero)" },
+  },
+  {
+    id: "malbolge", name: "Malbolge", monaco: "malbolge", runtime: "server", serverId: "malbolge",
+    ext: ".mb", sample: malbolge, group: "esoteric",
+    syntax: { comment: "n/a", variable: "trit registers a,c,d", fn: "n/a", io: "*, / (out / in)", loop: "self-modifying", conditional: "encrypted opcodes" },
+  },
+  {
+    id: "lolcode", name: "LOLCODE", monaco: "lolcode", runtime: "server", serverId: "lolcode",
+    ext: ".lol", sample: lolcode, group: "esoteric",
+    syntax: { comment: "BTW comment", variable: "I HAS A X ITZ 10", fn: "HOW IZ I F YR X …", io: "VISIBLE X", loop: "IM IN YR LOOP … IM OUTTA YR LOOP", conditional: "O RLY? … OIC" },
+  },
+  {
+    id: "shakespeare", name: "Shakespeare", monaco: "shakespeare", runtime: "server", serverId: "shakespeare",
+    ext: ".spl", sample: shakespeare, group: "esoteric",
+    syntax: { comment: "stage directions", variable: "characters", fn: "acts / scenes", io: "Speak your mind!", loop: "Let us return to scene I", conditional: "Am I better than you?" },
+  },
+];
+
+export const ALL_LANGUAGES: LanguageDef[] = [...CORE, ...WEIRD, ...ESOTERIC];
+export const LANGUAGES: LanguageDef[] = CORE; // back-compat default list
+export const LANG_BY_ID: Record<string, LanguageDef> = Object.fromEntries(
+  ALL_LANGUAGES.map((l) => [l.id, l])
+);

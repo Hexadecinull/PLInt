@@ -286,3 +286,63 @@ export async function runPhp(code: string): Promise<RunResult> {
   res.durationMs = performance.now() - start;
   return res;
 }
+
+// -------- HTML (live preview in an iframe) --------
+
+export async function runHtml(code: string): Promise<RunResult> {
+  const res = emptyResult();
+  res.html = code;
+  res.stdout = "(rendered preview above)";
+  res.ok = true;
+  res.durationMs = 0;
+  return res;
+}
+
+// -------- Brainfuck (30k-cell tape, in-browser) --------
+
+export async function runBrainfuck(code: string): Promise<RunResult> {
+  const res = emptyResult();
+  const start = performance.now();
+  const out: string[] = [];
+  try {
+    const tape = new Uint8Array(30000);
+    let ptr = 0, pc = 0;
+    // Pre-compute jump table for [ and ].
+    const jumps = new Map<number, number>();
+    const stack: number[] = [];
+    for (let i = 0; i < code.length; i++) {
+      if (code[i] === "[") stack.push(i);
+      else if (code[i] === "]") {
+        const s = stack.pop();
+        if (s == null) throw new Error("Unmatched ] at position " + i);
+        jumps.set(s, i); jumps.set(i, s);
+      }
+    }
+    if (stack.length) throw new Error("Unmatched [ at position " + stack[0]);
+
+    const MAX_STEPS = 5_000_000;
+    let steps = 0;
+    while (pc < code.length) {
+      if (++steps > MAX_STEPS) throw new Error("Execution limit reached (" + MAX_STEPS + " steps)");
+      const c = code[pc];
+      switch (c) {
+        case ">": ptr = (ptr + 1) % 30000; break;
+        case "<": ptr = (ptr - 1 + 30000) % 30000; break;
+        case "+": tape[ptr] = (tape[ptr] + 1) & 0xff; break;
+        case "-": tape[ptr] = (tape[ptr] - 1) & 0xff; break;
+        case ".": out.push(String.fromCharCode(tape[ptr])); break;
+        case ",": tape[ptr] = 0; break; // no stdin
+        case "[": if (tape[ptr] === 0) pc = jumps.get(pc)!; break;
+        case "]": if (tape[ptr] !== 0) pc = jumps.get(pc)!; break;
+      }
+      pc++;
+    }
+    res.stdout = out.join("");
+    res.ok = true;
+  } catch (e) {
+    res.ok = false;
+    res.stderr = formatError(e);
+  }
+  res.durationMs = performance.now() - start;
+  return res;
+}
