@@ -7,6 +7,8 @@ export interface RunResult {
   durationMs: number;
   /** True when execution completed without runtime error. */
   ok: boolean;
+  /** Optional HTML preview payload (for HTML runtime). */
+  html?: string;
 }
 
 export interface Diagnostic {
