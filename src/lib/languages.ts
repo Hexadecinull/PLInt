@@ -12,7 +12,7 @@ export type RuntimeKind =
   | "brainfuck"
   | "server";
 
-export type LanguageGroup = "core" | "weird" | "esoteric";
+export type LanguageGroup = "core" | "weird" | "esoteric" | "assembly";
 
 export interface LanguageDef {
   id: string;
@@ -496,6 +496,143 @@ export const WEIRD: LanguageDef[] = [
   },
 ];
 
+// ---------------- extra core (JVM / BEAM) ----------------
+
+const scala = `// Scala — PLInt
+object Main extends App {
+  (0 until 3).foreach(i => println(s"Hello #$i"))
+}
+`;
+const clojure = `; Clojure — PLInt
+(dotimes [i 3] (println (str "Hello #" i)))
+`;
+const erlang = `%% Erlang — PLInt
+-module(main).
+-export([main/0]).
+main() ->
+    lists:foreach(fun(I) -> io:format("Hello #~p~n", [I]) end, lists:seq(0, 2)).
+`;
+
+CORE.push(
+  {
+    id: "scala", name: "Scala", monaco: "scala", runtime: "server", serverId: "scala",
+    ext: ".scala", sample: scala,
+    syntax: { comment: "// comment", variable: "val x = 10", fn: "def f(x: Int): Int = ...", io: "println(x)", loop: "for (i <- 0 until n)", conditional: "if (x > 0) ..." },
+  },
+  {
+    id: "clojure", name: "Clojure", monaco: "clojure", runtime: "server", serverId: "clojure",
+    ext: ".clj", sample: clojure,
+    syntax: { comment: "; comment", variable: "(def x 10)", fn: "(defn f [x] ...)", io: "(println x)", loop: "(dotimes [i n] ...)", conditional: "(if (> x 0) ... ...)" },
+  },
+  {
+    id: "erlang", name: "Erlang", monaco: "erlang", runtime: "server", serverId: "erlang",
+    ext: ".erl", sample: erlang,
+    syntax: { comment: "%% comment", variable: "X = 10.", fn: "f(X) -> ... .", io: "io:format(\"~p~n\", [X]).", loop: "lists:foreach(fun(I)-> ... end, L).", conditional: "case X of _ -> ... end." },
+  },
+);
+
+// ---------------- weird / esoteric extras ----------------
+
+const cmake = `# CMake — PLInt
+cmake_minimum_required(VERSION 3.16)
+project(Hello LANGUAGES C)
+add_executable(hello hello.c)
+message(STATUS "Hello, world!")
+`;
+const makefile = `# Makefile — PLInt
+.PHONY: all
+all:
+\t@for i in 1 2 3; do echo "Hello #$$i"; done
+`;
+const whitespace = `   \t\n\t\n \t\n  \t\t \t\t  \n\t\n  \n\n\n`;
+const binaryLang = `01001000 01100101 01101100 01101100 01101111 00100001
+; Binary — each 8-bit byte is one ASCII character.
+`;
+const malbolgeU = `('&%:9]!~}|z2Vxwv-,POqponl$Hjig%eB@@>}=<M:9wv6WsU2T|nm-,jcL(I&%$#"
+; Malbolge Unshackled — same encrypted opcodes, unbounded tape width.
+`;
+const befunge = `>              v
+v  ,,,,,"Hello"<
+>25*,          v
+,,,,,,"World!",<
+@`;
+const piet = `# Piet — PLInt
+# Piet is a 2D visual language; source is an image of colored codels.
+# This text placeholder is for reference only — real programs are PNG images.
+`;
+const intercal = `PLEASE DO ,1 <- #13
+DO ,1 SUB #1 <- #238
+PLEASE DO ,1 SUB #2 <- #108
+DO ,1 SUB #3 <- #112
+PLEASE READ OUT ,1
+PLEASE GIVE UP
+`;
+const chef = `Hello World Souffle.
+
+Ingredients.
+72 g haricot beans
+101 eggs
+108 g lard
+111 ml oil
+
+Method.
+Put haricot beans into mixing bowl.
+Put eggs into mixing bowl.
+Liquefy contents of the mixing bowl.
+Pour contents of the mixing bowl into the baking dish.
+
+Serves 1.
+`;
+const ook = `Ook. Ook? Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.
+Ook? Ook. Ook. Ook? Ook! Ook? Ook! Ook. Ook.
+`;
+const deadfish = `iiisiiiiiiiiioiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiio
+`;
+
+const svelteAsm = ""; // placeholder unused
+
+// ---------- ASSEMBLY sample (shared, small) ----------
+const asmSample = (title: string) => `; ${title} — PLInt sample
+; Replace with your own program. Server executes via serverId.
+    mov     eax, 1
+    ret
+`;
+const wat = `;; WebAssembly Text Format — PLInt
+(module
+  (func $add (param i32 i32) (result i32)
+    local.get 0
+    local.get 1
+    i32.add)
+  (export "add" (func $add)))
+`;
+const llvmIr = `; LLVM IR — PLInt
+define i32 @main() {
+  ret i32 0
+}
+`;
+const jasmin = `; Jasmin (JVM bytecode) — PLInt
+.class public Hello
+.super java/lang/Object
+
+.method public static main([Ljava/lang/String;)V
+   .limit stack 2
+   getstatic java/lang/System/out Ljava/io/PrintStream;
+   ldc "Hello, world!"
+   invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+   return
+.end method
+`;
+const cil = `// CIL / MSIL — PLInt
+.assembly Hello {}
+.method static void Main() cil managed
+{
+  .entrypoint
+  ldstr "Hello, world!"
+  call void [mscorlib]System.Console::WriteLine(string)
+  ret
+}
+`;
+
 export const ESOTERIC: LanguageDef[] = [
   {
     id: "brainfuck", name: "Brainfuck", monaco: "brainfuck", runtime: "brainfuck",
@@ -508,6 +645,11 @@ export const ESOTERIC: LanguageDef[] = [
     syntax: { comment: "n/a", variable: "trit registers a,c,d", fn: "n/a", io: "*, / (out / in)", loop: "self-modifying", conditional: "encrypted opcodes" },
   },
   {
+    id: "malbolge-u", name: "Malbolge Unshackled", monaco: "malbolge", runtime: "server", serverId: "malbolge-u",
+    ext: ".mbu", sample: malbolgeU, group: "esoteric",
+    syntax: { comment: "n/a", variable: "unbounded trit tape", fn: "n/a", io: "*, / (out / in)", loop: "self-modifying", conditional: "encrypted opcodes" },
+  },
+  {
     id: "lolcode", name: "LOLCODE", monaco: "lolcode", runtime: "server", serverId: "lolcode",
     ext: ".lol", sample: lolcode, group: "esoteric",
     syntax: { comment: "BTW comment", variable: "I HAS A X ITZ 10", fn: "HOW IZ I F YR X …", io: "VISIBLE X", loop: "IM IN YR LOOP … IM OUTTA YR LOOP", conditional: "O RLY? … OIC" },
@@ -517,10 +659,108 @@ export const ESOTERIC: LanguageDef[] = [
     ext: ".spl", sample: shakespeare, group: "esoteric",
     syntax: { comment: "stage directions", variable: "characters", fn: "acts / scenes", io: "Speak your mind!", loop: "Let us return to scene I", conditional: "Am I better than you?" },
   },
+  {
+    id: "whitespace", name: "Whitespace", monaco: "plaintext", runtime: "server", serverId: "whitespace",
+    ext: ".ws", sample: whitespace, group: "esoteric",
+    syntax: { comment: "only space/tab/LF matter", variable: "stack values", fn: "labelled subroutines", io: "TAB LF S S (out num)", loop: "labels + jumps", conditional: "JZ / JN" },
+  },
+  {
+    id: "binary", name: "Binary", monaco: "plaintext", runtime: "server", serverId: "binary",
+    ext: ".bin", sample: binaryLang, group: "esoteric",
+    syntax: { comment: "; comment", variable: "raw bytes", fn: "n/a", io: "byte streams", loop: "n/a", conditional: "n/a" },
+  },
+  {
+    id: "befunge", name: "Befunge", monaco: "plaintext", runtime: "server", serverId: "befunge",
+    ext: ".bf98", sample: befunge, group: "esoteric",
+    syntax: { comment: "2D — no line comments", variable: "stack", fn: "n/a", io: ". , (out) & , ~ (in)", loop: "direction: > < ^ v", conditional: "_ | (H/V branch)" },
+  },
+  {
+    id: "piet", name: "Piet", monaco: "plaintext", runtime: "server", serverId: "piet",
+    ext: ".piet", sample: piet, group: "esoteric",
+    syntax: { comment: "image only", variable: "codel stack", fn: "n/a", io: "hue shift ops", loop: "direction pointer", conditional: "lightness delta" },
+  },
+  {
+    id: "intercal", name: "INTERCAL", monaco: "plaintext", runtime: "server", serverId: "intercal",
+    ext: ".i", sample: intercal, group: "esoteric",
+    syntax: { comment: "PLEASE NOTE …", variable: ",1 <- #10", fn: "(1) DO …", io: "READ OUT / WRITE IN", loop: "DO … WHILE (n)", conditional: "DO … IF" },
+  },
+  {
+    id: "chef", name: "Chef", monaco: "plaintext", runtime: "server", serverId: "chef",
+    ext: ".chef", sample: chef, group: "esoteric",
+    syntax: { comment: "recipe prose", variable: "ingredients", fn: "auxiliary recipe", io: "Serves N.", loop: "Verb the ingredient until …", conditional: "If …" },
+  },
+  {
+    id: "ook", name: "Ook!", monaco: "plaintext", runtime: "server", serverId: "ook",
+    ext: ".ook", sample: ook, group: "esoteric",
+    syntax: { comment: "n/a", variable: "cell (like Brainfuck)", fn: "n/a", io: "Ook. Ook! (out)", loop: "Ook! Ook? … Ook? Ook!", conditional: "same as loop" },
+  },
+  {
+    id: "deadfish", name: "Deadfish", monaco: "plaintext", runtime: "server", serverId: "deadfish",
+    ext: ".df", sample: deadfish, group: "esoteric",
+    syntax: { comment: "n/a", variable: "single accumulator", fn: "n/a", io: "o (out num)", loop: "n/a", conditional: "n/a (auto zero at 256)" },
+  },
 ];
 
-export const ALL_LANGUAGES: LanguageDef[] = [...CORE, ...WEIRD, ...ESOTERIC];
+// Convenience: build assembly entries with a shared template.
+function asm(id: string, name: string, ext: string, serverId?: string, sampleText?: string): LanguageDef {
+  return {
+    id, name, monaco: "plaintext", runtime: "server", serverId: serverId ?? id,
+    ext, sample: sampleText ?? asmSample(name), group: "assembly",
+    syntax: {
+      comment: "; comment",
+      variable: "registers / memory",
+      fn: "label: … ret",
+      io: "syscall / int / bl",
+      loop: "cmp + jcc → label",
+      conditional: "cmp + jcc",
+    },
+  };
+}
+
+export const ASSEMBLY: LanguageDef[] = [
+  asm("asm-x86_64", "x86-64 / x64 Assembly", ".s"),
+  asm("asm-x86", "x86 Assembly", ".asm"),
+  asm("asm-arm", "ARM Assembly", ".s"),
+  asm("asm-arm-cm", "ARM Cortex-M Assembly", ".s"),
+  asm("asm-riscv", "RISC-V Assembly", ".s"),
+  asm("asm-avr", "AVR Assembly", ".s"),
+  asm("asm-pic", "PIC Assembly", ".asm"),
+  asm("asm-xtensa", "ESP32 / Tensilica Xtensa Assembly", ".s"),
+  asm("asm-6502", "MOS 6502 Assembly", ".s"),
+  asm("asm-z80", "Zilog Z80 Assembly", ".z80"),
+  asm("asm-m68k", "Motorola 68000 / m68k Assembly", ".s"),
+  asm("asm-mips", "MIPS Assembly", ".s"),
+  asm("asm-ppc", "PowerPC / POWER Assembly", ".s"),
+  asm("asm-sparc", "SPARC Assembly", ".s"),
+  asm("asm-s390", "IBM System/360 & z/Architecture Assembly", ".s"),
+  asm("asm-wat", "WebAssembly Text Format", ".wat", "wat", wat),
+  asm("asm-ebpf", "eBPF Assembly", ".ebpf"),
+  asm("asm-llvm", "LLVM Intermediate Representation", ".ll", "llvm", llvmIr),
+  asm("asm-jasmin", "Java Bytecode / Jasmin Assembly", ".j", "jasmin", jasmin),
+  asm("asm-cil", "CIL / MSIL", ".il", "cil", cil),
+  asm("asm-intel", "Intel Syntax", ".asm"),
+  asm("asm-att", "AT&T Syntax", ".s"),
+  asm("asm-nasm", "NASM", ".asm"),
+  asm("asm-masm", "MASM", ".asm"),
+  asm("asm-gas", "GNU Assembler (GAS)", ".s"),
+];
+
+WEIRD.push(
+  {
+    id: "cmake", name: "CMake", monaco: "cmake", runtime: "server", serverId: "cmake",
+    ext: ".cmake", sample: cmake, group: "weird",
+    syntax: { comment: "# comment", variable: "set(X value)", fn: "function(name ARGS)\n…\nendfunction()", io: "message(STATUS \"x\")", loop: "foreach(i RANGE 3)\n…\nendforeach()", conditional: "if(cond)\n…\nendif()" },
+  },
+  {
+    id: "makefile", name: "Makefile", monaco: "makefile", runtime: "server", serverId: "makefile",
+    ext: "Makefile", sample: makefile, group: "weird",
+    syntax: { comment: "# comment", variable: "X = 10", fn: "target: deps\\n\\trecipe", io: "@echo $(X)", loop: "for i in 1 2; do ... ; done", conditional: "ifeq ($(X),1)\\n…\\nendif" },
+  },
+);
+
+export const ALL_LANGUAGES: LanguageDef[] = [...CORE, ...WEIRD, ...ESOTERIC, ...ASSEMBLY];
 export const LANGUAGES: LanguageDef[] = CORE; // back-compat default list
 export const LANG_BY_ID: Record<string, LanguageDef> = Object.fromEntries(
   ALL_LANGUAGES.map((l) => [l.id, l])
 );
+
