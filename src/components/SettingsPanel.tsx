@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { X, Lock } from "lucide-react";
+import { X, ArrowLeft } from "lucide-react";
 import { getServerEndpoint, setServerEndpoint } from "@/lib/runners";
 import { useSettings, type Settings } from "@/lib/settings";
 import { useAnimatedOpen } from "@/hooks/use-animated-open";
-import { WEIRD, ESOTERIC, type LanguageDef } from "@/lib/languages";
+import { WEIRD, ESOTERIC, ASSEMBLY, type LanguageDef } from "@/lib/languages";
 import { useSecretState, toggleSecretLanguage, setSecretState } from "@/lib/secret";
 
 interface Props {
@@ -26,6 +26,7 @@ export function SettingsPanel({ open, onClose }: Props) {
   const { mounted, state } = useAnimatedOpen(open);
   const [secret] = useSecretState();
   const [showSecret, setShowSecret] = useState(false);
+  const [bounceKey, setBounceKey] = useState(0);
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -43,6 +44,7 @@ export function SettingsPanel({ open, onClose }: Props) {
   if (!mounted) return null;
 
   const onGearClick = () => {
+    setBounceKey((k) => k + 1);
     clickCountRef.current += 1;
     if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
     clickTimerRef.current = setTimeout(() => { clickCountRef.current = 0; }, 2000);
@@ -69,7 +71,7 @@ export function SettingsPanel({ open, onClose }: Props) {
       >
         <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
           <h2 className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-            ~/Settings
+            {showSecret ? "~/Settings/secret" : "~/Settings"}
           </h2>
           <button
             onClick={onClose}
@@ -86,6 +88,50 @@ export function SettingsPanel({ open, onClose }: Props) {
           ) : (
             <div className="grid gap-6 md:grid-cols-2">
               <div>
+                <Section title="Appearance">
+                  <Segmented
+                    label="Theme"
+                    value={settings.theme}
+                    options={[
+                      { id: "dark", label: "Dark" },
+                      { id: "light", label: "Light" },
+                    ]}
+                    onChange={(v) => update({ theme: v as Settings["theme"] })}
+                  />
+                  <Row label="Accent">
+                    <div className="flex flex-wrap gap-2">
+                      {ACCENTS.map((a) => (
+                        <button
+                          key={a.id}
+                          onClick={() => update({ accent: a.id })}
+                          aria-label={a.label}
+                          title={a.label}
+                          className={
+                            "h-6 w-6 rounded-full border-2 " +
+                            (settings.accent === a.id ? "border-foreground" : "border-transparent")
+                          }
+                          style={{ background: a.swatch }}
+                        />
+                      ))}
+                    </div>
+                  </Row>
+                  <Toggle
+                    label="Deeper accent (tint the whole UI)"
+                    checked={settings.deepAccent}
+                    onChange={(v) => update({ deepAccent: v })}
+                  />
+                  <Segmented
+                    label="Density"
+                    value={settings.density}
+                    options={[
+                      { id: "comfortable", label: "Comfortable" },
+                      { id: "compact", label: "Compact" },
+                    ]}
+                    onChange={(v) => update({ density: v as Settings["density"] })}
+                  />
+                  <Toggle label="Reduced motion" checked={settings.reducedMotion} onChange={(v) => update({ reducedMotion: v })} />
+                </Section>
+
                 <Section title="Editor">
                   <Row label={`Font size — ${settings.fontSize}px`}>
                     <input
@@ -135,33 +181,6 @@ export function SettingsPanel({ open, onClose }: Props) {
               <div>
                 <Section title="Workspace">
                   <Toggle label="Auto-save buffers" checked={settings.autoSave} onChange={(v) => update({ autoSave: v })} />
-                  <Toggle label="Reduced motion" checked={settings.reducedMotion} onChange={(v) => update({ reducedMotion: v })} />
-                  <Segmented
-                    label="Density"
-                    value={settings.density}
-                    options={[
-                      { id: "comfortable", label: "Comfortable" },
-                      { id: "compact", label: "Compact" },
-                    ]}
-                    onChange={(v) => update({ density: v as Settings["density"] })}
-                  />
-                  <Row label="Accent">
-                    <div className="flex flex-wrap gap-2">
-                      {ACCENTS.map((a) => (
-                        <button
-                          key={a.id}
-                          onClick={() => update({ accent: a.id })}
-                          aria-label={a.label}
-                          title={a.label}
-                          className={
-                            "h-6 w-6 rounded-full border-2 " +
-                            (settings.accent === a.id ? "border-foreground" : "border-transparent")
-                          }
-                          style={{ background: a.swatch }}
-                        />
-                      ))}
-                    </div>
-                  </Row>
                 </Section>
 
                 <Section title="Server-side execution">
@@ -190,28 +209,20 @@ export function SettingsPanel({ open, onClose }: Props) {
           )}
         </div>
 
-        {/* footer: secret gear + version */}
+        {/* footer: hidden gear (bounces on click) + version */}
         <div className="flex items-center justify-between border-t border-border px-2 py-1.5">
           <button
+            key={bounceKey}
             aria-hidden
             tabIndex={-1}
             onClick={onGearClick}
-            className="cursor-default select-none bg-transparent px-1 text-[13px] opacity-70 outline-none"
+            className="animate-gear-bounce cursor-default select-none bg-transparent px-1 text-[13px] opacity-70 outline-none"
             style={{ background: "transparent" }}
           >
             ⚙️
           </button>
           <div className="font-mono text-[10px] text-muted-foreground">
-            {secret.unlocked && (
-              <button
-                onClick={() => setShowSecret((v) => !v)}
-                className="mr-3 inline-flex items-center gap-1 text-primary hover:underline"
-              >
-                <Lock className="h-3 w-3" />
-                {showSecret ? "Back to Settings" : "Secret menu"}
-              </button>
-            )}
-            PLInt v0.2
+            PLInt v0.3
           </div>
         </div>
       </div>
@@ -233,14 +244,16 @@ function SecretMenu({ enabled, onBack }: { enabled: string[]; onBack: () => void
         </div>
         <button
           onClick={onBack}
-          className="rounded-md border border-border bg-surface-2 px-2.5 py-1 font-mono text-[11px] hover:bg-surface-3"
+          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 py-1 font-mono text-[11px] hover:bg-surface-3"
         >
-          Back
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to Settings
         </button>
       </div>
 
       <SecretGroup title="Weird languages" langs={WEIRD} enabled={enabled} />
       <SecretGroup title="Esoteric languages" langs={ESOTERIC} enabled={enabled} />
+      <SecretGroup title="Assembly" langs={ASSEMBLY} enabled={enabled} />
     </div>
   );
 }
@@ -267,13 +280,13 @@ function SecretGroup({
                     : "border-border bg-surface-2/60 text-muted-foreground hover:bg-surface-2")
                 }
               >
-                <span className="flex items-center gap-2">
-                  <span>{l.name}</span>
-                  <span className="text-[10px] text-muted-foreground/70">{l.ext}</span>
+                <span className="flex min-w-0 items-center gap-2">
+                  <span className="truncate">{l.name}</span>
+                  <span className="shrink-0 text-[10px] text-muted-foreground/70">{l.ext}</span>
                 </span>
                 <span
                   className={
-                    "text-[10px] uppercase tracking-wider " +
+                    "shrink-0 text-[10px] uppercase tracking-wider " +
                     (on ? "text-primary" : "text-muted-foreground/60")
                   }
                 >
