@@ -42,20 +42,37 @@ export function EditorPane({ language, value, onChange }: Props) {
         "editorWhitespace.foreground": "#2a3540",
       },
     });
+    monaco.editor.defineTheme("plint-light", {
+      base: "vs",
+      inherit: true,
+      rules: [
+        { token: "comment", foreground: "7a8391", fontStyle: "italic" },
+        { token: "keyword", foreground: "0a7a6a" },
+        { token: "string", foreground: "8a5a10" },
+        { token: "number", foreground: "5a3fbf" },
+        { token: "type", foreground: "1c5fa8" },
+      ],
+      colors: {
+        "editor.background": "#fafbfc",
+        "editor.foreground": "#1a2028",
+      },
+    });
   };
+
+  const themeName = settings.theme === "light" ? "plint-light" : "plint-dark";
 
   const onMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-    monaco.editor.setTheme("plint-dark");
+    monaco.editor.setTheme(themeName);
     setReady(true);
   };
 
   useEffect(() => {
     if (ready && monacoRef.current) {
-      monacoRef.current.editor.setTheme("plint-dark");
+      monacoRef.current.editor.setTheme(themeName);
     }
-  }, [language.id, ready]);
+  }, [language.id, ready, themeName]);
 
   return (
     <div className="h-full w-full overflow-hidden rounded-md border border-border bg-[oklch(0.10_0.005_240)]">

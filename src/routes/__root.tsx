@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { applyAccent, applyDensity, applyMotion, applyTheme, getSettings } from "@/lib/settings";
 
 function NotFoundComponent() {
   return (
@@ -117,6 +118,14 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    const cfg = getSettings();
+    applyTheme(cfg.theme);
+    applyAccent(cfg.accent, cfg.deepAccent, cfg.theme);
+    applyMotion(cfg.reducedMotion);
+    applyDensity(cfg.density);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
