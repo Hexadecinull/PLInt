@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * PLInt — minimalist dark UI with a Linux-terminal flavor.
+ * PLInt — minimalist UI with a Linux-terminal flavor.
  * All colors are OKLCH tokens; no ad-hoc colors in components.
  */
 
@@ -45,7 +45,6 @@
 :root, .dark {
   --radius: 0.375rem;
 
-  /* Near-black, slightly warm — feels like a modern terminal. */
   --background: oklch(0.14 0.005 240);
   --foreground: oklch(0.94 0.005 240);
   --surface:    oklch(0.16 0.005 240);
@@ -83,6 +82,36 @@
   --shadow-panel: 0 20px 60px -30px oklch(0 0 0 / 0.7);
 }
 
+/* Light theme — same tokens, inverted lightness. */
+:root.light {
+  --background: oklch(0.985 0.004 240);
+  --foreground: oklch(0.18 0.008 240);
+  --surface:    oklch(0.965 0.004 240);
+  --surface-2:  oklch(0.935 0.005 240);
+  --surface-3:  oklch(0.900 0.006 240);
+
+  --card: oklch(0.965 0.004 240);
+  --card-foreground: oklch(0.18 0.008 240);
+  --popover: oklch(0.98 0.003 240);
+  --popover-foreground: oklch(0.18 0.008 240);
+
+  --primary-foreground: oklch(0.99 0 0);
+
+  --secondary: oklch(0.92 0.006 240);
+  --secondary-foreground: oklch(0.18 0.008 240);
+  --muted: oklch(0.94 0.005 240);
+  --muted-foreground: oklch(0.45 0.010 240);
+  --accent-foreground: oklch(0.14 0 0);
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --terminal-green: oklch(0.55 0.20 145);
+
+  --border: oklch(0.86 0.006 240);
+  --input:  oklch(0.94 0.005 240);
+
+  --shadow-panel: 0 20px 60px -30px oklch(0 0 0 / 0.2);
+}
+
 /* Density mode — quietly tightens paddings in a few spots. */
 :root[data-density="compact"] {
   --radius: 0.3rem;
@@ -96,13 +125,13 @@
     color: var(--color-foreground);
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
-    /* Subtle scanline overlay for the terminal vibe — barely visible. */
     background-image:
       repeating-linear-gradient(
         180deg,
         transparent 0 3px,
         color-mix(in oklab, var(--foreground) 2%, transparent) 3px 4px
       );
+    transition: background-color var(--dur-base) var(--ease), color var(--dur-base) var(--ease);
   }
   ::selection {
     background: color-mix(in oklab, var(--primary) 35%, transparent);
@@ -145,6 +174,14 @@
   from { opacity: 1; transform: translateY(0); }
   to   { opacity: 0; transform: translateY(3px); }
 }
+@keyframes plint-page-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes plint-page-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
 @keyframes plint-scale-in {
   from { opacity: 0; transform: scale(0.97); }
   to   { opacity: 1; transform: scale(1); }
@@ -156,10 +193,6 @@
 @keyframes plint-slide-in-left {
   from { opacity: 0; transform: translateX(-8px); }
   to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes plint-slide-out-left {
-  from { opacity: 1; transform: translateX(0); }
-  to   { opacity: 0; transform: translateX(-8px); }
 }
 @keyframes plint-drawer-in {
   from { transform: translateX(-100%); }
@@ -177,16 +210,24 @@
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0.2; }
 }
+@keyframes plint-bounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.78) rotate(-12deg); }
+  70%  { transform: scale(1.12) rotate(8deg); }
+  100% { transform: scale(1) rotate(0); }
+}
 
-/* Public utilities — all timed identically for a coherent feel. */
 :root {
   --dur-fast: 140ms;
   --dur-base: 200ms;
+  --dur-slow: 280ms;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @utility animate-fade-in       { animation: plint-fade-in  var(--dur-base) var(--ease) both; }
 @utility animate-fade-out      { animation: plint-fade-out var(--dur-base) var(--ease) both; }
+@utility animate-page-in       { animation: plint-page-in  var(--dur-slow) var(--ease) both; }
+@utility animate-page-out      { animation: plint-page-out var(--dur-slow) var(--ease) both; }
 @utility animate-scale-in      { animation: plint-scale-in var(--dur-base) var(--ease) both; }
 @utility animate-scale-out     { animation: plint-scale-out var(--dur-base) var(--ease) both; }
 @utility animate-slide-in-left { animation: plint-slide-in-left var(--dur-base) var(--ease) both; }
@@ -194,6 +235,7 @@
 @utility animate-drawer-out    { animation: plint-drawer-out var(--dur-base) var(--ease) both; }
 @utility animate-blink         { animation: plint-blink 1s steps(2, end) infinite; }
 @utility animate-caret         { animation: plint-caret 1.1s steps(2, end) infinite; }
+@utility animate-gear-bounce   { animation: plint-bounce 420ms var(--ease) both; }
 
 /* data-state driven entrance/exit for modals & popovers. */
 [data-state="open"][data-anim="overlay"]  { animation: plint-fade-in var(--dur-base) var(--ease) both; }
@@ -203,7 +245,20 @@
 [data-state="open"][data-anim="drawer"]   { animation: plint-drawer-in var(--dur-base) var(--ease) both; }
 [data-state="closed"][data-anim="drawer"] { animation: plint-drawer-out var(--dur-base) var(--ease) both; }
 
-/* Reduced-motion mode — turn all custom animations off. */
+/* Sidebar collapse — animate the inner wrapper's opacity/translate so the
+   panel resize feels intentional. */
+[data-sidebar-inner][data-collapsed="true"] {
+  opacity: 0;
+  transform: translateX(-8px);
+  pointer-events: none;
+}
+[data-sidebar-inner] {
+  transition:
+    opacity var(--dur-base) var(--ease),
+    transform var(--dur-base) var(--ease);
+}
+
+/* Reduced-motion mode. */
 :root[data-motion="reduced"] *,
 :root[data-motion="reduced"] *::before,
 :root[data-motion="reduced"] *::after {
