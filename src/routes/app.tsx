@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Group, Panel, Separator } from "react-resizable-panels";
+import { Group, Panel, Separator, usePanelRef } from "react-resizable-panels";
 import { LANG_BY_ID, type LanguageDef } from "@/lib/languages";
 import { runCode, type RunResult } from "@/lib/runners";
 import { EditorPane } from "@/components/EditorPane";
@@ -8,7 +8,7 @@ import { LanguageSidebar } from "@/components/LanguageSidebar";
 import { OutputPane } from "@/components/OutputPane";
 import { SyntaxGuide } from "@/components/SyntaxGuide";
 import { Toolbar } from "@/components/Toolbar";
-import { applyAccent, applyDensity, applyMotion, getSettings } from "@/lib/settings";
+import { applyAccent, applyDensity, applyMotion, applyTheme, getSettings } from "@/lib/settings";
 import type { SavedFile } from "@/lib/files";
 import { useSecretState, enabledLanguages } from "@/lib/secret";
 
@@ -26,12 +26,12 @@ export const Route = createFileRoute("/app")({
       {
         name: "description",
         content:
-          "The PLInt workspace: run and edit code in 30+ programming languages, with saved files, live errors and full syntax highlighting.",
+          "The PLInt workspace: run and edit code in 60+ programming languages, with saved files, live errors and full syntax highlighting.",
       },
       { property: "og:title", content: "PLInt — Workspace" },
       {
         property: "og:description",
-        content: "Run 30+ programming languages online — instantly, in one tab.",
+        content: "Run 60+ programming languages online — instantly, in one tab.",
       },
     ],
   }),
@@ -39,7 +39,6 @@ export const Route = createFileRoute("/app")({
 });
 
 const STORAGE_KEY = "plint.state.v1";
-const LAYOUT_KEY = "plint.layout.v1";
 
 interface PersistedState {
   active: string;
@@ -73,6 +72,7 @@ function PLInt() {
   const [settingsEverOpened, setSettingsEverOpened] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [secret] = useSecretState();
+  const sidebarPanelRef = usePanelRef();
 
   useEffect(() => { if (filesOpen) setFilesEverOpened(true); }, [filesOpen]);
   useEffect(() => { if (settingsOpen) setSettingsEverOpened(true); }, [settingsOpen]);
@@ -85,10 +85,20 @@ function PLInt() {
     setSidebarCollapsed(Boolean(s.sidebarCollapsed));
     setHydrated(true);
     const cfg = getSettings();
-    applyAccent(cfg.accent);
+    applyTheme(cfg.theme);
+    applyAccent(cfg.accent, cfg.deepAccent, cfg.theme);
     applyMotion(cfg.reducedMotion);
     applyDensity(cfg.density);
   }, []);
+
+  // Drive the collapsible sidebar panel via imperative ref so its
+  // last-expanded size is preserved across toggles.
+  useEffect(() => {
+    const p = sidebarPanelRef.current;
+    if (!p) return;
+    if (sidebarCollapsed) p.collapse();
+    else p.expand();
+  }, [sidebarCollapsed, hydrated, sidebarPanelRef]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -178,7 +188,7 @@ function PLInt() {
   };
 
   return (
-    <div className="relative flex h-screen w-screen flex-col overflow-hidden bg-background text-foreground">
+    <div className="relative flex h-screen w-screen animate-page-in flex-col overflow-hidden bg-background text-foreground">
       <Toolbar
         language={lang}
         running={running}
@@ -195,17 +205,30 @@ function PLInt() {
         {/* Desktop: resizable layout with collapsible sidebar. */}
         <div className="hidden min-h-0 flex-1 md:flex">
           <Group orientation="horizontal" className="flex min-h-0 flex-1">
+            <Panel
+              panelRef={sidebarPanelRef}
+              id="sidebar"
+              defaultSize="18%"
+              minSize="200px"
+              maxSize="34%"
+              collapsible
+              collapsedSize={0}
+              className="min-h-0 overflow-hidden"
+            >
+              <div
+                data-sidebar-inner
+                data-collapsed={sidebarCollapsed || undefined}
+                className="flex h-full min-w-[200px]"
+              >
+                <LanguageSidebar
+                  languages={langs}
+                  active={lang.id}
+                  onSelect={(l) => { setActive(l.id); setResult(null); }}
+                />
+              </div>
+            </Panel>
             {!sidebarCollapsed && (
-              <>
-                <Panel defaultSize="16%" minSize="10%" maxSize="30%" className="min-h-0">
-                  <LanguageSidebar
-                    languages={langs}
-                    active={lang.id}
-                    onSelect={(l) => { setActive(l.id); setResult(null); }}
-                  />
-                </Panel>
-                <Separator className="w-1 bg-border/60 transition-colors hover:bg-primary/60" />
-              </>
+              <Separator className="w-1 bg-border/60 transition-colors hover:bg-primary/60" />
             )}
             <Panel minSize="30%" className="min-h-0">
               <Group orientation="vertical" className="flex min-h-0 flex-1 flex-col">

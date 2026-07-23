@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { Terminal, ArrowRight, Github } from "lucide-react";
 import { ALL_LANGUAGES, LANGUAGES } from "@/lib/languages";
 
@@ -9,13 +10,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Run 30+ programming languages online — Python, JavaScript, TypeScript, Java, C#, F#, Rust, Go, Ruby, Swift, Julia, Elixir, Nim, HTML and more. No accounts, no installs. Open source (GPL-3.0).",
+          "Run 60+ programming languages online — Python, JavaScript, TypeScript, Java, C#, F#, Rust, Go, Ruby, Swift, Julia, Elixir, Nim, HTML, Scala, Clojure, Erlang, Assembly and more. No accounts, no installs. Open source (GPL-3.0).",
       },
       { property: "og:title", content: "PLInt — Online Interpreter Hub" },
       {
         property: "og:description",
         content:
-          "One tab. 30+ languages. Full syntax highlighting, live errors, saved files, instant execution.",
+          "One tab. 60+ languages. Full syntax highlighting, live errors, saved files, instant execution.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -25,8 +26,24 @@ export const Route = createFileRoute("/")({
 });
 
 function Welcome() {
+  const navigate = useNavigate();
+  const [leaving, setLeaving] = useState(false);
+
+  const enter = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (leaving) return;
+    setLeaving(true);
+    // Match --dur-slow so the fade-out completes before the /app fade-in starts.
+    setTimeout(() => navigate({ to: "/app" }), 260);
+  };
+
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden bg-background text-foreground">
+    <div
+      className={
+        "relative flex min-h-screen flex-col overflow-hidden bg-background text-foreground " +
+        (leaving ? "animate-page-out" : "animate-page-in")
+      }
+    >
       {/* subtle grid */}
       <div
         aria-hidden
@@ -77,7 +94,7 @@ function Welcome() {
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6 py-14 text-center animate-fade-in">
+      <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6 py-14 text-center">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-border bg-surface-2/70 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
           <span className="h-1.5 w-1.5 rounded-full bg-terminal-green animate-blink" />
           {ALL_LANGUAGES.length} languages · one browser tab
@@ -95,13 +112,14 @@ function Welcome() {
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            to="/app"
+          <a
+            href="/app"
+            onClick={enter}
             className="group inline-flex items-center gap-2 rounded-md border border-primary/60 bg-primary/15 px-5 py-2.5 font-mono text-sm text-primary shadow-[var(--shadow-glow)] hover:bg-primary/25"
           >
             Launch PLInt
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
+          </a>
           <a
             href="#languages"
             className="inline-flex items-center gap-2 rounded-md border border-border bg-surface-2/70 px-5 py-2.5 font-mono text-sm text-muted-foreground hover:text-foreground"

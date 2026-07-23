@@ -19,7 +19,10 @@ export function LanguageSidebar({ languages, active, onSelect }: Props) {
       {languages.map((l) => {
         const isActive = l.id === active;
         const badge =
-          l.group === "esoteric" ? "eso" : l.group === "weird" ? "weird" : null;
+          l.group === "esoteric" ? "eso"
+          : l.group === "assembly" ? "asm"
+          : l.group === "weird" ? "weird"
+          : null;
         return (
           <button
             key={l.id}
