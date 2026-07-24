@@ -249,8 +249,15 @@ export function SettingsPanel({ open, onClose }: Props) {
             ⚙️
           </button>
           <div className="font-mono text-[10px] text-muted-foreground">
-            PLInt v0.3
+            <button
+              onClick={() => setShowAbout(true)}
+              className="text-primary hover:underline"
+            >
+              About
+            </button>
+            {" \u00A0•\u00A0 PLInt v0.3"}
           </div>
+
         </div>
       </div>
     </div>
