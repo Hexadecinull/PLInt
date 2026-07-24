@@ -25,6 +25,8 @@ export interface Settings {
   indentGuides: boolean;
   density: "compact" | "comfortable";
   reducedMotion: boolean;
+  customAccentHex?: string;
+
 }
 
 export const DEFAULT_SETTINGS: Settings = {
