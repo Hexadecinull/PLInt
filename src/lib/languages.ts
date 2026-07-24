@@ -699,7 +699,23 @@ export const ESOTERIC: LanguageDef[] = [
     ext: ".df", sample: deadfish, group: "esoteric",
     syntax: { comment: "n/a", variable: "single accumulator", fn: "n/a", io: "o (out num)", loop: "n/a", conditional: "n/a (auto zero at 256)" },
   },
+  {
+    id: "chicken", name: "Chicken", monaco: "plaintext", runtime: "server", serverId: "chicken",
+    ext: ".chn", sample: "chicken chicken\nchicken chicken chicken\n", group: "esoteric",
+    syntax: { comment: "n/a", variable: "stack", fn: "n/a", io: "chicken (out)", loop: "n/a", conditional: "chicken chicken" },
+  },
+  {
+    id: "arnoldc", name: "ArnoldC", monaco: "plaintext", runtime: "server", serverId: "arnoldc",
+    ext: ".arnoldc", sample: "IT'S SHOWTIME\nTALK TO THE HAND \"Hello, world!\"\nYOU HAVE BEEN TERMINATED\n", group: "esoteric",
+    syntax: { comment: "n/a", variable: "HEY CHRISTMAS TREE x", fn: "LISTEN TO ME VERY CAREFULLY", io: "TALK TO THE HAND", loop: "STICK AROUND ... CHILL", conditional: "BECAUSE I'M GOING TO SAY PLEASE" },
+  },
+  {
+    id: "rockstar", name: "Rockstar", monaco: "rockstar", runtime: "server", serverId: "rockstar",
+    ext: ".rock", sample: "Tommy was a lovestruck ladykiller\nShout Tommy\n", group: "esoteric",
+    syntax: { comment: "(comment)", variable: "Put 5 into X", fn: "Foo takes X and Y", io: "Shout X", loop: "While X is greater than 0", conditional: "If X is nothing" },
+  },
 ];
+
 
 // Convenience: build assembly entries with a shared template.
 function asm(id: string, name: string, ext: string, serverId?: string, sampleText?: string): LanguageDef {
