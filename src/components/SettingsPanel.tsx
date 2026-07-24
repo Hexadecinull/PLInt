@@ -457,7 +457,7 @@ function AboutView({ onBack }: { onBack: () => void }) {
 
       <AboutSection title={`Languages supported (${total})`}>
         <ul className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground sm:grid-cols-3">
-          {langs.ALL_LANGUAGES.map((l) => (
+          {ALL_LANGUAGES.map((l) => (
             <li key={l.id} className="truncate">
               <span className="text-foreground/80">{l.name}</span>
               <span className="ml-1 text-muted-foreground/60">{l.ext}</span>
