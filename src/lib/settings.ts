@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 const KEY = "plint.settings.v3";
 
-export type AccentId = "cyan" | "violet" | "amber" | "rose" | "emerald" | "mono";
+export type AccentId = "cyan" | "violet" | "amber" | "rose" | "emerald" | "mono" | "custom";
 export type ThemeId = "dark" | "light";
 
 export interface Settings {
