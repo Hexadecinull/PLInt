@@ -418,10 +418,8 @@ function Segmented<T extends string>({
 }
 
 function AboutView({ onBack }: { onBack: () => void }) {
-  // Lazy require to avoid a heavy import chain here.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const langs = require("@/lib/languages") as typeof import("@/lib/languages");
-  const total = langs.ALL_LANGUAGES.length;
+  const total = ALL_LANGUAGES.length;
+
   return (
     <div className="animate-fade-in font-mono text-[12px] leading-relaxed">
       <div className="mb-4 flex items-center justify-between">
