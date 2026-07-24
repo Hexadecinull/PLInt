@@ -3,7 +3,7 @@ import { X, ArrowLeft } from "lucide-react";
 import { getServerEndpoint, setServerEndpoint } from "@/lib/runners";
 import { useSettings, type Settings } from "@/lib/settings";
 import { useAnimatedOpen } from "@/hooks/use-animated-open";
-import { WEIRD, ESOTERIC, ASSEMBLY, type LanguageDef } from "@/lib/languages";
+import { ALL_LANGUAGES, WEIRD, ESOTERIC, ASSEMBLY, type LanguageDef } from "@/lib/languages";
 import { useSecretState, toggleSecretLanguage, setSecretState } from "@/lib/secret";
 
 interface Props {
