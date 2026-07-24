@@ -101,11 +101,11 @@ export function useSettings(): [Settings, (p: Partial<Settings>) => void] {
 }
 
 // Per-accent hue used for deep-accent (Material You) tinting.
-const ACCENT_HUE: Record<AccentId, number> = {
+const ACCENT_HUE: Record<Exclude<AccentId, "custom">, number> = {
   cyan: 185, violet: 295, amber: 80, rose: 15, emerald: 155, mono: 240,
 };
 
-const ACCENT_MAP: Record<AccentId, { primary: string; glow: string; accent: string }> = {
+const ACCENT_MAP: Record<Exclude<AccentId, "custom">, { primary: string; glow: string; accent: string }> = {
   cyan:    { primary: "oklch(0.82 0.14 185)", glow: "oklch(0.88 0.12 175)", accent: "oklch(0.75 0.10 200)" },
   violet:  { primary: "oklch(0.74 0.15 295)", glow: "oklch(0.82 0.13 280)", accent: "oklch(0.78 0.12 200)" },
   amber:   { primary: "oklch(0.84 0.15 80)",  glow: "oklch(0.90 0.12 85)",  accent: "oklch(0.74 0.13 40)"  },
@@ -113,6 +113,7 @@ const ACCENT_MAP: Record<AccentId, { primary: string; glow: string; accent: stri
   emerald: { primary: "oklch(0.78 0.15 155)", glow: "oklch(0.85 0.12 150)", accent: "oklch(0.74 0.11 200)" },
   mono:    { primary: "oklch(0.92 0.005 240)", glow: "oklch(0.98 0.003 240)", accent: "oklch(0.72 0.02 240)" },
 };
+
 
 // CSS variables that get tinted with the accent hue when Deep accent is on.
 // Values are `[L, C]` — chroma varies per surface so lower layers stay subtle.
