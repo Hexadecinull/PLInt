@@ -86,7 +86,7 @@ function PLInt() {
     setHydrated(true);
     const cfg = getSettings();
     applyTheme(cfg.theme);
-    applyAccent(cfg.accent, cfg.deepAccent, cfg.theme);
+    applyAccent(cfg.accent, cfg.deepAccent, cfg.theme, cfg.customAccentHex);
     applyMotion(cfg.reducedMotion);
     applyDensity(cfg.density);
   }, []);
