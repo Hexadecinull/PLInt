@@ -40,9 +40,11 @@ export function SettingsPanel({ open, onClose }: Props) {
   useEffect(() => {
     if (!open) {
       setShowSecret(false);
+      setShowAbout(false);
       clickCountRef.current = 0;
     }
   }, [open]);
+
 
   if (!mounted) return null;
 
