@@ -92,13 +92,20 @@ function PLInt() {
   }, []);
 
   // Drive the collapsible sidebar panel via imperative ref so its
-  // last-expanded size is preserved across toggles.
+  // last-expanded size is preserved across toggles. Toggle a brief
+  // `sidebarAnimating` flag so a CSS transition on flex plays without
+  // interfering with drag-resize the rest of the time.
+  const [sidebarAnimating, setSidebarAnimating] = useState(false);
   useEffect(() => {
     const p = sidebarPanelRef.current;
     if (!p) return;
+    setSidebarAnimating(true);
     if (sidebarCollapsed) p.collapse();
     else p.expand();
+    const t = setTimeout(() => setSidebarAnimating(false), 280);
+    return () => clearTimeout(t);
   }, [sidebarCollapsed, hydrated, sidebarPanelRef]);
+
 
   useEffect(() => {
     if (!hydrated) return;
