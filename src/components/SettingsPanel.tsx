@@ -26,6 +26,9 @@ export function SettingsPanel({ open, onClose }: Props) {
   const { mounted, state } = useAnimatedOpen(open);
   const [secret] = useSecretState();
   const [showSecret, setShowSecret] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showCustomPicker, setShowCustomPicker] = useState(false);
+
   const [bounceKey, setBounceKey] = useState(0);
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
