@@ -108,7 +108,7 @@ export function SettingsPanel({ open, onClose }: Props) {
                     onChange={(v) => update({ theme: v as Settings["theme"] })}
                   />
                   <Row label="Accent">
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       {ACCENTS.map((a) => (
                         <button
                           key={a.id}
@@ -122,13 +122,31 @@ export function SettingsPanel({ open, onClose }: Props) {
                           style={{ background: a.swatch }}
                         />
                       ))}
+                      <button
+                        onClick={() => setShowCustomPicker((v) => !v)}
+                        className={
+                          "flex h-6 items-center gap-1 rounded-md border px-2 font-mono text-[10px] uppercase " +
+                          (settings.accent === "custom"
+                            ? "border-primary text-primary"
+                            : "border-border text-muted-foreground hover:text-foreground")
+                        }
+                      >
+                        {showCustomPicker ? "▾" : "▸"} Custom
+                      </button>
                     </div>
+                    {showCustomPicker && (
+                      <CustomColorPicker
+                        hex={settings.customAccentHex ?? "#4dd0e1"}
+                        onChange={(hex) => update({ accent: "custom", customAccentHex: hex })}
+                      />
+                    )}
                   </Row>
                   <Toggle
                     label="Deeper accent (tint the whole UI)"
                     checked={settings.deepAccent}
                     onChange={(v) => update({ deepAccent: v })}
                   />
+
                   <Segmented
                     label="Density"
                     value={settings.density}
