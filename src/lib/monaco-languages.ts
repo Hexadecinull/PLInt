@@ -261,4 +261,112 @@ export function registerCustomLanguages(monaco: Monaco) {
       },
     });
   }
+
+  if (!has("erlang")) {
+    monaco.languages.register({ id: "erlang" });
+    monaco.languages.setMonarchTokensProvider("erlang", {
+      defaultToken: "",
+      keywords: [
+        "after","and","andalso","band","begin","bnot","bor","bsl","bsr","bxor","case","catch",
+        "cond","div","end","fun","if","let","not","of","or","orelse","receive","rem","try","when","xor",
+      ],
+      tokenizer: {
+        root: [
+          [/%.*$/, "comment"],
+          [/"([^"\\]|\\.)*"/, "string"],
+          [/'([^'\\]|\\.)*'/, "string"],
+          [/-[a-z_]+/, "keyword.directive"],
+          [/\?[A-Z_][\w]*/, "constant"],
+          [/[A-Z_][\w]*/, "variable"],
+          [/[a-z][\w@]*/, {
+            cases: { "@keywords": "keyword", "@default": "identifier" },
+          }],
+          [/\b\d+(\.\d+)?\b/, "number"],
+          [/[{}()\[\]]/, "@brackets"],
+          [/[<>=!+\-*/|:;,.]+/, "operator"],
+        ],
+      },
+    });
+  }
+
+  // Generic assembly tokenizer for ASM variants without a dedicated one.
+  if (!has("plint-asm")) {
+    monaco.languages.register({ id: "plint-asm" });
+    monaco.languages.setMonarchTokensProvider("plint-asm", {
+      defaultToken: "",
+      ignoreCase: true,
+      tokenizer: {
+        root: [
+          [/[;#].*$/, "comment"],
+          [/\/\/.*$/, "comment"],
+          [/"([^"\\]|\\.)*"/, "string"],
+          [/'([^'\\]|\\.)*'/, "string"],
+          [/^\s*[.\w][\w.$]*:/, "type"],
+          [/\.[a-zA-Z_][\w]*/, "keyword.directive"],
+          [/%?\b(?:e?[abcd]x|[abcd][hl]|e?[sd]i|e?[bs]p|r\d+[bdw]?|r[abcd]x|r[sd]i|r[bs]p|xmm\d+|ymm\d+|zmm\d+|st\d+|cr\d+|dr\d+|[xwbhd]\d+|sp|lr|pc|fp|zero|ra|gp|tp|[stwafv]\d+)\b/, "variable"],
+          [/\$?-?\b0x[0-9a-fA-F]+\b|#?-?\b\d+\b/, "number"],
+          [/[a-zA-Z_][\w.]*/, "identifier"],
+          [/[,()\[\]{}]/, "delimiter"],
+          [/[+\-*/=<>!&|~^]/, "operator"],
+        ],
+      },
+    });
+  }
+
+  if (!has("wat")) {
+    monaco.languages.register({ id: "wat" });
+    monaco.languages.setMonarchTokensProvider("wat", {
+      defaultToken: "",
+      tokenizer: {
+        root: [
+          [/;;.*$/, "comment"],
+          [/\(;/, "comment", "@comment"],
+          [/"([^"\\]|\\.)*"/, "string"],
+          [/\$[\w.$]+/, "variable"],
+          [/\b(?:module|func|param|result|local|export|import|memory|table|global|type|call|call_indirect|block|loop|if|else|end|br|br_if|br_table|return|nop|drop|select)\b/, "keyword"],
+          [/\b(?:i32|i64|f32|f64|v128|funcref|externref)(?:\.[a-z_]+)?/, "type"],
+          [/-?\b0x[0-9a-fA-F]+\b|-?\b\d+(?:\.\d+)?\b/, "number"],
+          [/[()]/, "@brackets"],
+        ],
+        comment: [[/;\)/, "comment", "@pop"], [/./, "comment"]],
+      },
+    });
+  }
+
+  if (!has("llvm-ir")) {
+    monaco.languages.register({ id: "llvm-ir" });
+    monaco.languages.setMonarchTokensProvider("llvm-ir", {
+      defaultToken: "",
+      tokenizer: {
+        root: [
+          [/;.*$/, "comment"],
+          [/"([^"\\]|\\.)*"/, "string"],
+          [/[%@][\w.$-]+/, "variable"],
+          [/\b(?:define|declare|ret|br|switch|call|invoke|alloca|load|store|getelementptr|icmp|fcmp|add|sub|mul|sdiv|udiv|and|or|xor|shl|lshr|ashr|phi|select|bitcast|trunc|zext|sext|ptrtoint|inttoptr|to|label|void|null|true|false|constant|global|internal|external|private|dso_local|nounwind|noinline|nocapture|readonly|readnone|align)\b/, "keyword"],
+          [/\bi\d+\b|\b(?:half|float|double|void|metadata|token)\b/, "type"],
+          [/-?\b0x[0-9a-fA-F]+\b|-?\b\d+(?:\.\d+)?\b/, "number"],
+          [/[{}()\[\]]/, "@brackets"],
+          [/[=,*]/, "delimiter"],
+        ],
+      },
+    });
+  }
+
+  // Rockstar (poetic literals — best-effort highlight).
+  if (!has("rockstar")) {
+    monaco.languages.register({ id: "rockstar" });
+    monaco.languages.setMonarchTokensProvider("rockstar", {
+      defaultToken: "",
+      ignoreCase: true,
+      tokenizer: {
+        root: [
+          [/\(.*?\)/, "comment"],
+          [/"([^"\\]|\\.)*"/, "string"],
+          [/\b(?:let|be|put|into|is|was|were|says|shout|say|whisper|scream|if|else|while|until|take|top|of|and|or|not|nothing|null|nowhere|true|false|yes|no|mysterious|listen|to|give|back|return|build|up|knock|down|break|it|continue)\b/, "keyword"],
+          [/\b\d+(?:\.\d+)?\b/, "number"],
+        ],
+      },
+    });
+  }
 }
+
