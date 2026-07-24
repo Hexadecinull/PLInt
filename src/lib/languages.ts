@@ -531,6 +531,100 @@ CORE.push(
   },
 );
 
+// ---------------- more core (added Aug 2025) ----------------
+const objc = `// Objective-C — PLInt
+#import <Foundation/Foundation.h>
+int main() { @autoreleasepool { NSLog(@"Hello, world!"); } return 0; }
+`;
+const objcpp = `// Objective-C++ — PLInt
+#import <Foundation/Foundation.h>
+#include <string>
+int main() { @autoreleasepool { std::string s = "world"; NSLog(@"Hello, %s!", s.c_str()); } return 0; }
+`;
+const crystal = `# Crystal — PLInt
+3.times { |i| puts "Hello ##{i}" }
+`;
+const vlang = `// V — PLInt
+fn main() { for i in 0 .. 3 { println('Hello #$i') } }
+`;
+const gleam = `// Gleam — PLInt
+import gleam/io
+pub fn main() { io.println("Hello, world!") }
+`;
+const solidity = `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+contract Hello { function greet() public pure returns (string memory) { return "Hello, world!"; } }
+`;
+const elm = `-- Elm — PLInt
+module Main exposing (main)
+import Html exposing (text)
+main = text "Hello, world!"
+`;
+const dlang = `// D — PLInt
+import std.stdio;
+void main() { foreach (i; 0 .. 3) writeln("Hello #", i); }
+`;
+const fortran = `! Fortran — PLInt
+program hello
+  integer :: i
+  do i = 0, 2
+    print *, "Hello #", i
+  end do
+end program hello
+`;
+const cobol = `       IDENTIFICATION DIVISION.
+       PROGRAM-ID. HELLO.
+       PROCEDURE DIVISION.
+           DISPLAY "Hello, world!".
+           STOP RUN.
+`;
+const awk = `# AWK — PLInt
+BEGIN { for (i = 0; i < 3; i++) print "Hello #" i }
+`;
+const clisp = `;; Common Lisp — PLInt
+(dotimes (i 3) (format t "Hello #~a~%" i))
+`;
+
+CORE.push(
+  { id: "objc", name: "Objective-C", monaco: "objective-c", runtime: "server", serverId: "objc",
+    ext: ".m", sample: objc,
+    syntax: { comment: "// comment", variable: "NSString *s = @\"x\";", fn: "- (void)foo { ... }", io: "NSLog(@\"%@\", s);", loop: "for (int i=0;i<n;i++)", conditional: "if (x) { ... }" } },
+  { id: "objcpp", name: "Objective-C++", monaco: "objective-c", runtime: "server", serverId: "objcpp",
+    ext: ".mm", sample: objcpp,
+    syntax: { comment: "// comment", variable: "auto s = std::string();", fn: "- (void)foo { ... }", io: "NSLog(...); std::cout <<", loop: "for (auto& x : xs)", conditional: "if (x) { ... }" } },
+  { id: "crystal", name: "Crystal", monaco: "crystal", runtime: "server", serverId: "crystal",
+    ext: ".cr", sample: crystal,
+    syntax: { comment: "# comment", variable: "x = 10", fn: "def f(x) ... end", io: "puts x", loop: "n.times { |i| ... }", conditional: "if x > 0 ... end" } },
+  { id: "vlang", name: "V", monaco: "go", runtime: "server", serverId: "v",
+    ext: ".v", sample: vlang,
+    syntax: { comment: "// comment", variable: "x := 10", fn: "fn f(x int) int { ... }", io: "println(x)", loop: "for i in 0..n { ... }", conditional: "if x > 0 { ... }" } },
+  { id: "gleam", name: "Gleam", monaco: "plaintext", runtime: "server", serverId: "gleam",
+    ext: ".gleam", sample: gleam,
+    syntax: { comment: "// comment", variable: "let x = 10", fn: "pub fn f(x) { ... }", io: "io.println(x)", loop: "list.each(xs, fn(x) { ... })", conditional: "case x { ... }" } },
+  { id: "solidity", name: "Solidity", monaco: "sol", runtime: "server", serverId: "solidity",
+    ext: ".sol", sample: solidity,
+    syntax: { comment: "// comment", variable: "uint256 x = 10;", fn: "function f() public { ... }", io: "emit Event(x);", loop: "for (uint i; i<n; i++)", conditional: "if (x > 0) { ... }" } },
+  { id: "elm", name: "Elm", monaco: "elm", runtime: "server", serverId: "elm",
+    ext: ".elm", sample: elm,
+    syntax: { comment: "-- comment", variable: "x = 10", fn: "f x = ...", io: "text \"x\"", loop: "List.map f xs", conditional: "if x > 0 then ... else ..." } },
+  { id: "dlang", name: "D", monaco: "d", runtime: "server", serverId: "d",
+    ext: ".d", sample: dlang,
+    syntax: { comment: "// comment", variable: "auto x = 10;", fn: "int f(int x) { ... }", io: "writeln(x);", loop: "foreach (i; 0 .. n)", conditional: "if (x > 0) { ... }" } },
+  { id: "fortran", name: "Fortran", monaco: "plaintext", runtime: "server", serverId: "fortran",
+    ext: ".f90", sample: fortran,
+    syntax: { comment: "! comment", variable: "integer :: x", fn: "subroutine f(x) ... end", io: "print *, x", loop: "do i = 0, n ... end do", conditional: "if (x > 0) then ... end if" } },
+  { id: "cobol", name: "COBOL", monaco: "plaintext", runtime: "server", serverId: "cobol",
+    ext: ".cob", sample: cobol,
+    syntax: { comment: "* comment", variable: "01 X PIC 9.", fn: "PROCEDURE DIVISION.", io: "DISPLAY X.", loop: "PERFORM N TIMES", conditional: "IF X > 0 ... END-IF" } },
+  { id: "awk", name: "AWK", monaco: "plaintext", runtime: "server", serverId: "awk",
+    ext: ".awk", sample: awk,
+    syntax: { comment: "# comment", variable: "x = 10", fn: "function f(x) { ... }", io: "print x", loop: "for (i=0;i<n;i++)", conditional: "if (x > 0) { ... }" } },
+  { id: "clisp", name: "Common Lisp", monaco: "scheme", runtime: "server", serverId: "clisp",
+    ext: ".lisp", sample: clisp,
+    syntax: { comment: ";; comment", variable: "(defvar x 10)", fn: "(defun f (x) ...)", io: "(format t \"~a\" x)", loop: "(dotimes (i n) ...)", conditional: "(if (> x 0) ... ...)" } },
+);
+
+
 // ---------------- weird / esoteric extras ----------------
 
 const cmake = `# CMake — PLInt
