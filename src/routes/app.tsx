@@ -86,19 +86,26 @@ function PLInt() {
     setHydrated(true);
     const cfg = getSettings();
     applyTheme(cfg.theme);
-    applyAccent(cfg.accent, cfg.deepAccent, cfg.theme);
+    applyAccent(cfg.accent, cfg.deepAccent, cfg.theme, cfg.customAccentHex);
     applyMotion(cfg.reducedMotion);
     applyDensity(cfg.density);
   }, []);
 
   // Drive the collapsible sidebar panel via imperative ref so its
-  // last-expanded size is preserved across toggles.
+  // last-expanded size is preserved across toggles. Toggle a brief
+  // `sidebarAnimating` flag so a CSS transition on flex plays without
+  // interfering with drag-resize the rest of the time.
+  const [sidebarAnimating, setSidebarAnimating] = useState(false);
   useEffect(() => {
     const p = sidebarPanelRef.current;
     if (!p) return;
+    setSidebarAnimating(true);
     if (sidebarCollapsed) p.collapse();
     else p.expand();
+    const t = setTimeout(() => setSidebarAnimating(false), 280);
+    return () => clearTimeout(t);
   }, [sidebarCollapsed, hydrated, sidebarPanelRef]);
+
 
   useEffect(() => {
     if (!hydrated) return;
@@ -213,8 +220,12 @@ function PLInt() {
               maxSize="34%"
               collapsible
               collapsedSize={0}
-              className="min-h-0 overflow-hidden"
+              className={
+                "min-h-0 overflow-hidden " +
+                (sidebarAnimating ? "sidebar-anim" : "")
+              }
             >
+
               <div
                 data-sidebar-inner
                 data-collapsed={sidebarCollapsed || undefined}

@@ -531,6 +531,100 @@ CORE.push(
   },
 );
 
+// ---------------- more core (added Aug 2025) ----------------
+const objc = `// Objective-C — PLInt
+#import <Foundation/Foundation.h>
+int main() { @autoreleasepool { NSLog(@"Hello, world!"); } return 0; }
+`;
+const objcpp = `// Objective-C++ — PLInt
+#import <Foundation/Foundation.h>
+#include <string>
+int main() { @autoreleasepool { std::string s = "world"; NSLog(@"Hello, %s!", s.c_str()); } return 0; }
+`;
+const crystal = `# Crystal — PLInt
+3.times { |i| puts "Hello ##{i}" }
+`;
+const vlang = `// V — PLInt
+fn main() { for i in 0 .. 3 { println('Hello #$i') } }
+`;
+const gleam = `// Gleam — PLInt
+import gleam/io
+pub fn main() { io.println("Hello, world!") }
+`;
+const solidity = `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+contract Hello { function greet() public pure returns (string memory) { return "Hello, world!"; } }
+`;
+const elm = `-- Elm — PLInt
+module Main exposing (main)
+import Html exposing (text)
+main = text "Hello, world!"
+`;
+const dlang = `// D — PLInt
+import std.stdio;
+void main() { foreach (i; 0 .. 3) writeln("Hello #", i); }
+`;
+const fortran = `! Fortran — PLInt
+program hello
+  integer :: i
+  do i = 0, 2
+    print *, "Hello #", i
+  end do
+end program hello
+`;
+const cobol = `       IDENTIFICATION DIVISION.
+       PROGRAM-ID. HELLO.
+       PROCEDURE DIVISION.
+           DISPLAY "Hello, world!".
+           STOP RUN.
+`;
+const awk = `# AWK — PLInt
+BEGIN { for (i = 0; i < 3; i++) print "Hello #" i }
+`;
+const clisp = `;; Common Lisp — PLInt
+(dotimes (i 3) (format t "Hello #~a~%" i))
+`;
+
+CORE.push(
+  { id: "objc", name: "Objective-C", monaco: "objective-c", runtime: "server", serverId: "objc",
+    ext: ".m", sample: objc,
+    syntax: { comment: "// comment", variable: "NSString *s = @\"x\";", fn: "- (void)foo { ... }", io: "NSLog(@\"%@\", s);", loop: "for (int i=0;i<n;i++)", conditional: "if (x) { ... }" } },
+  { id: "objcpp", name: "Objective-C++", monaco: "objective-c", runtime: "server", serverId: "objcpp",
+    ext: ".mm", sample: objcpp,
+    syntax: { comment: "// comment", variable: "auto s = std::string();", fn: "- (void)foo { ... }", io: "NSLog(...); std::cout <<", loop: "for (auto& x : xs)", conditional: "if (x) { ... }" } },
+  { id: "crystal", name: "Crystal", monaco: "crystal", runtime: "server", serverId: "crystal",
+    ext: ".cr", sample: crystal,
+    syntax: { comment: "# comment", variable: "x = 10", fn: "def f(x) ... end", io: "puts x", loop: "n.times { |i| ... }", conditional: "if x > 0 ... end" } },
+  { id: "vlang", name: "V", monaco: "go", runtime: "server", serverId: "v",
+    ext: ".v", sample: vlang,
+    syntax: { comment: "// comment", variable: "x := 10", fn: "fn f(x int) int { ... }", io: "println(x)", loop: "for i in 0..n { ... }", conditional: "if x > 0 { ... }" } },
+  { id: "gleam", name: "Gleam", monaco: "plaintext", runtime: "server", serverId: "gleam",
+    ext: ".gleam", sample: gleam,
+    syntax: { comment: "// comment", variable: "let x = 10", fn: "pub fn f(x) { ... }", io: "io.println(x)", loop: "list.each(xs, fn(x) { ... })", conditional: "case x { ... }" } },
+  { id: "solidity", name: "Solidity", monaco: "sol", runtime: "server", serverId: "solidity",
+    ext: ".sol", sample: solidity,
+    syntax: { comment: "// comment", variable: "uint256 x = 10;", fn: "function f() public { ... }", io: "emit Event(x);", loop: "for (uint i; i<n; i++)", conditional: "if (x > 0) { ... }" } },
+  { id: "elm", name: "Elm", monaco: "elm", runtime: "server", serverId: "elm",
+    ext: ".elm", sample: elm,
+    syntax: { comment: "-- comment", variable: "x = 10", fn: "f x = ...", io: "text \"x\"", loop: "List.map f xs", conditional: "if x > 0 then ... else ..." } },
+  { id: "dlang", name: "D", monaco: "d", runtime: "server", serverId: "d",
+    ext: ".d", sample: dlang,
+    syntax: { comment: "// comment", variable: "auto x = 10;", fn: "int f(int x) { ... }", io: "writeln(x);", loop: "foreach (i; 0 .. n)", conditional: "if (x > 0) { ... }" } },
+  { id: "fortran", name: "Fortran", monaco: "plaintext", runtime: "server", serverId: "fortran",
+    ext: ".f90", sample: fortran,
+    syntax: { comment: "! comment", variable: "integer :: x", fn: "subroutine f(x) ... end", io: "print *, x", loop: "do i = 0, n ... end do", conditional: "if (x > 0) then ... end if" } },
+  { id: "cobol", name: "COBOL", monaco: "plaintext", runtime: "server", serverId: "cobol",
+    ext: ".cob", sample: cobol,
+    syntax: { comment: "* comment", variable: "01 X PIC 9.", fn: "PROCEDURE DIVISION.", io: "DISPLAY X.", loop: "PERFORM N TIMES", conditional: "IF X > 0 ... END-IF" } },
+  { id: "awk", name: "AWK", monaco: "plaintext", runtime: "server", serverId: "awk",
+    ext: ".awk", sample: awk,
+    syntax: { comment: "# comment", variable: "x = 10", fn: "function f(x) { ... }", io: "print x", loop: "for (i=0;i<n;i++)", conditional: "if (x > 0) { ... }" } },
+  { id: "clisp", name: "Common Lisp", monaco: "scheme", runtime: "server", serverId: "clisp",
+    ext: ".lisp", sample: clisp,
+    syntax: { comment: ";; comment", variable: "(defvar x 10)", fn: "(defun f (x) ...)", io: "(format t \"~a\" x)", loop: "(dotimes (i n) ...)", conditional: "(if (> x 0) ... ...)" } },
+);
+
+
 // ---------------- weird / esoteric extras ----------------
 
 const cmake = `# CMake — PLInt
@@ -699,12 +793,28 @@ export const ESOTERIC: LanguageDef[] = [
     ext: ".df", sample: deadfish, group: "esoteric",
     syntax: { comment: "n/a", variable: "single accumulator", fn: "n/a", io: "o (out num)", loop: "n/a", conditional: "n/a (auto zero at 256)" },
   },
+  {
+    id: "chicken", name: "Chicken", monaco: "plaintext", runtime: "server", serverId: "chicken",
+    ext: ".chn", sample: "chicken chicken\nchicken chicken chicken\n", group: "esoteric",
+    syntax: { comment: "n/a", variable: "stack", fn: "n/a", io: "chicken (out)", loop: "n/a", conditional: "chicken chicken" },
+  },
+  {
+    id: "arnoldc", name: "ArnoldC", monaco: "plaintext", runtime: "server", serverId: "arnoldc",
+    ext: ".arnoldc", sample: "IT'S SHOWTIME\nTALK TO THE HAND \"Hello, world!\"\nYOU HAVE BEEN TERMINATED\n", group: "esoteric",
+    syntax: { comment: "n/a", variable: "HEY CHRISTMAS TREE x", fn: "LISTEN TO ME VERY CAREFULLY", io: "TALK TO THE HAND", loop: "STICK AROUND ... CHILL", conditional: "BECAUSE I'M GOING TO SAY PLEASE" },
+  },
+  {
+    id: "rockstar", name: "Rockstar", monaco: "rockstar", runtime: "server", serverId: "rockstar",
+    ext: ".rock", sample: "Tommy was a lovestruck ladykiller\nShout Tommy\n", group: "esoteric",
+    syntax: { comment: "(comment)", variable: "Put 5 into X", fn: "Foo takes X and Y", io: "Shout X", loop: "While X is greater than 0", conditional: "If X is nothing" },
+  },
 ];
 
+
 // Convenience: build assembly entries with a shared template.
-function asm(id: string, name: string, ext: string, serverId?: string, sampleText?: string): LanguageDef {
+function asm(id: string, name: string, ext: string, serverId?: string, sampleText?: string, monacoLang = "plint-asm"): LanguageDef {
   return {
-    id, name, monaco: "plaintext", runtime: "server", serverId: serverId ?? id,
+    id, name, monaco: monacoLang, runtime: "server", serverId: serverId ?? id,
     ext, sample: sampleText ?? asmSample(name), group: "assembly",
     syntax: {
       comment: "; comment",
@@ -716,6 +826,7 @@ function asm(id: string, name: string, ext: string, serverId?: string, sampleTex
     },
   };
 }
+
 
 export const ASSEMBLY: LanguageDef[] = [
   asm("asm-x86_64", "x86-64 / x64 Assembly", ".s"),
@@ -733,9 +844,9 @@ export const ASSEMBLY: LanguageDef[] = [
   asm("asm-ppc", "PowerPC / POWER Assembly", ".s"),
   asm("asm-sparc", "SPARC Assembly", ".s"),
   asm("asm-s390", "IBM System/360 & z/Architecture Assembly", ".s"),
-  asm("asm-wat", "WebAssembly Text Format", ".wat", "wat", wat),
+  asm("asm-wat", "WebAssembly Text Format", ".wat", "wat", wat, "wat"),
   asm("asm-ebpf", "eBPF Assembly", ".ebpf"),
-  asm("asm-llvm", "LLVM Intermediate Representation", ".ll", "llvm", llvmIr),
+  asm("asm-llvm", "LLVM Intermediate Representation", ".ll", "llvm", llvmIr, "llvm-ir"),
   asm("asm-jasmin", "Java Bytecode / Jasmin Assembly", ".j", "jasmin", jasmin),
   asm("asm-cil", "CIL / MSIL", ".il", "cil", cil),
   asm("asm-intel", "Intel Syntax", ".asm"),
@@ -743,7 +854,26 @@ export const ASSEMBLY: LanguageDef[] = [
   asm("asm-nasm", "NASM", ".asm"),
   asm("asm-masm", "MASM", ".asm"),
   asm("asm-gas", "GNU Assembler (GAS)", ".s"),
+  // New — main set
+  asm("asm-sm83", "Game Boy / Sharp SM83 Assembly", ".asm"),
+  asm("asm-ia64", "IA-64 / Itanium Assembly", ".s"),
+  asm("asm-sh", "SuperH Assembly", ".s"),
+  asm("asm-alpha", "DEC Alpha Assembly", ".s"),
+  asm("asm-pdp11", "PDP-11 Assembly", ".mac"),
+  asm("asm-vax", "VAX Assembly", ".s"),
+  asm("asm-1802", "RCA 1802 COSMAC Assembly", ".asm"),
+  // Bonus — syntaxes & exotic
+  asm("asm-aarch64", "AArch64 Assembly", ".s"),
+  asm("asm-fasm", "FASM", ".asm"),
+  asm("asm-yasm", "YASM", ".asm"),
+  asm("asm-subleq", "Subleq / OISC Assembly", ".sq"),
+  // Extras
+  asm("asm-tasm", "TASM (Turbo Assembler)", ".asm"),
+  asm("asm-hla", "HLA (High-Level Assembly)", ".hla"),
+  asm("asm-tricore", "Infineon TriCore Assembly", ".s"),
+  asm("asm-hexagon", "Qualcomm Hexagon Assembly", ".s"),
 ];
+
 
 WEIRD.push(
   {

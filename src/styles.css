@@ -283,3 +283,16 @@ button, a, input, select, textarea {
     opacity var(--dur-fast) var(--ease),
     transform var(--dur-fast) var(--ease);
 }
+
+/* Sidebar collapse/expand animation: transition flex only during a brief
+   window (~280ms) after toggling, so drag-resize stays instant. */
+.sidebar-anim {
+  transition: flex 260ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.sidebar-anim > div[data-sidebar-inner] {
+  transition: opacity 220ms var(--ease);
+}
+.sidebar-anim[style*="flex-grow: 0"] > div[data-sidebar-inner],
+.sidebar-anim[data-panel-size="0.0"] > div[data-sidebar-inner] {
+  opacity: 0;
+}

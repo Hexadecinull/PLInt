@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 const KEY = "plint.settings.v3";
 
-export type AccentId = "cyan" | "violet" | "amber" | "rose" | "emerald" | "mono";
+export type AccentId = "cyan" | "violet" | "amber" | "rose" | "emerald" | "mono" | "custom";
 export type ThemeId = "dark" | "light";
 
 export interface Settings {
@@ -25,6 +25,8 @@ export interface Settings {
   indentGuides: boolean;
   density: "compact" | "comfortable";
   reducedMotion: boolean;
+  customAccentHex?: string;
+
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -79,10 +81,11 @@ export function setSettings(patch: Partial<Settings>) {
   write(next);
   listeners.forEach((l) => l(next));
   applyTheme(next.theme);
-  applyAccent(next.accent, next.deepAccent, next.theme);
+  applyAccent(next.accent, next.deepAccent, next.theme, next.customAccentHex);
   applyMotion(next.reducedMotion);
   applyDensity(next.density);
 }
+
 
 export function useSettings(): [Settings, (p: Partial<Settings>) => void] {
   const [s, setS] = useState<Settings>(DEFAULT_SETTINGS);
@@ -98,11 +101,11 @@ export function useSettings(): [Settings, (p: Partial<Settings>) => void] {
 }
 
 // Per-accent hue used for deep-accent (Material You) tinting.
-const ACCENT_HUE: Record<AccentId, number> = {
+const ACCENT_HUE: Record<Exclude<AccentId, "custom">, number> = {
   cyan: 185, violet: 295, amber: 80, rose: 15, emerald: 155, mono: 240,
 };
 
-const ACCENT_MAP: Record<AccentId, { primary: string; glow: string; accent: string }> = {
+const ACCENT_MAP: Record<Exclude<AccentId, "custom">, { primary: string; glow: string; accent: string }> = {
   cyan:    { primary: "oklch(0.82 0.14 185)", glow: "oklch(0.88 0.12 175)", accent: "oklch(0.75 0.10 200)" },
   violet:  { primary: "oklch(0.74 0.15 295)", glow: "oklch(0.82 0.13 280)", accent: "oklch(0.78 0.12 200)" },
   amber:   { primary: "oklch(0.84 0.15 80)",  glow: "oklch(0.90 0.12 85)",  accent: "oklch(0.74 0.13 40)"  },
@@ -110,6 +113,7 @@ const ACCENT_MAP: Record<AccentId, { primary: string; glow: string; accent: stri
   emerald: { primary: "oklch(0.78 0.15 155)", glow: "oklch(0.85 0.12 150)", accent: "oklch(0.74 0.11 200)" },
   mono:    { primary: "oklch(0.92 0.005 240)", glow: "oklch(0.98 0.003 240)", accent: "oklch(0.72 0.02 240)" },
 };
+
 
 // CSS variables that get tinted with the accent hue when Deep accent is on.
 // Values are `[L, C]` — chroma varies per surface so lower layers stay subtle.
@@ -149,23 +153,57 @@ export function applyTheme(theme: ThemeId) {
   root.classList.toggle("dark", theme === "dark");
 }
 
-export function applyAccent(accent: AccentId, deep = false, theme: ThemeId = "dark") {
-  if (typeof document === "undefined") return;
-  const c = ACCENT_MAP[accent];
-  const r = document.documentElement.style;
-  r.setProperty("--primary", c.primary);
-  r.setProperty("--primary-glow", c.glow);
-  r.setProperty("--accent", c.accent);
-  r.setProperty("--ring", c.primary);
+function hexToOklch(hex: string): { primary: string; glow: string; accent: string; hue: number } | null {
+  const m = /^#?([0-9a-fA-F]{6})$/.exec(hex.trim());
+  if (!m) return null;
+  const int = parseInt(m[1], 16);
+  const r = ((int >> 16) & 255) / 255;
+  const g = ((int >> 8) & 255) / 255;
+  const b = (int & 255) / 255;
+  // sRGB → HSL for a simple hue extraction; L/C are stylized to match presets.
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  let h = 0;
+  if (max !== min) {
+    const d = max - min;
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0));
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+  }
+  return {
+    primary: `oklch(0.78 0.15 ${h.toFixed(1)})`,
+    glow: `oklch(0.86 0.13 ${h.toFixed(1)})`,
+    accent: `oklch(0.72 0.12 ${((h + 30) % 360).toFixed(1)})`,
+    hue: h,
+  };
+}
 
-  // Clear any previously applied deep-accent surface overrides first.
+export function applyAccent(accent: AccentId, deep = false, theme: ThemeId = "dark", customHex?: string) {
+  if (typeof document === "undefined") return;
+  const r = document.documentElement.style;
+  let primary: string, glow: string, accentCol: string, hue: number;
+  if (accent === "custom" && customHex) {
+    const c = hexToOklch(customHex);
+    if (!c) return;
+    primary = c.primary; glow = c.glow; accentCol = c.accent; hue = c.hue;
+  } else {
+    const key = (accent === "custom" ? "cyan" : accent) as Exclude<AccentId, "custom">;
+    const c = ACCENT_MAP[key];
+    primary = c.primary; glow = c.glow; accentCol = c.accent; hue = ACCENT_HUE[key];
+  }
+  r.setProperty("--primary", primary);
+  r.setProperty("--primary-glow", glow);
+  r.setProperty("--accent", accentCol);
+  r.setProperty("--ring", primary);
+
   DEEP_CLEAR_KEYS.forEach((k) => r.removeProperty(k));
 
   if (!deep || accent === "mono") return;
-  const hue = ACCENT_HUE[accent];
   const table = theme === "light" ? DEEP_LIGHT_SURFACES : DEEP_DARK_SURFACES;
   for (const [name, L, C] of table) {
     r.setProperty(name, `oklch(${L} ${C} ${hue})`);
+
   }
 }
 
