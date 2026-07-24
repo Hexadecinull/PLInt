@@ -57,11 +57,11 @@ export function SettingsPanel({ open, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md"
       onClick={onClose}
       data-state={state}
       data-anim="overlay"
-      style={{ background: "oklch(0 0 0 / 0.65)" }}
+      style={{ background: "oklch(0 0 0 / 0.55)" }}
     >
       <div
         className="w-full max-w-lg overflow-hidden rounded-md border border-border bg-popover shadow-[var(--shadow-panel)] md:max-w-3xl"
@@ -71,8 +71,9 @@ export function SettingsPanel({ open, onClose }: Props) {
       >
         <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
           <h2 className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-            {showSecret ? "~/Settings/secret" : "~/Settings"}
+            {showAbout ? "~/Settings/about" : showSecret ? "~/Settings/secret" : "~/Settings"}
           </h2>
+
           <button
             onClick={onClose}
             aria-label="Close"
