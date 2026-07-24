@@ -89,9 +89,12 @@ export function SettingsPanel({ open, onClose }: Props) {
         </div>
 
         <div className="scroll-slim max-h-[72vh] overflow-y-auto p-4 md:p-6">
-          {showSecret ? (
+          {showAbout ? (
+            <AboutView onBack={() => setShowAbout(false)} />
+          ) : showSecret ? (
             <SecretMenu enabled={secret.enabled} onBack={() => setShowSecret(false)} />
           ) : (
+
             <div className="grid gap-6 md:grid-cols-2">
               <div>
                 <Section title="Appearance">
