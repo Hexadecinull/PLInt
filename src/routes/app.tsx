@@ -220,8 +220,12 @@ function PLInt() {
               maxSize="34%"
               collapsible
               collapsedSize={0}
-              className="min-h-0 overflow-hidden"
+              className={
+                "min-h-0 overflow-hidden " +
+                (sidebarAnimating ? "sidebar-anim" : "")
+              }
             >
+
               <div
                 data-sidebar-inner
                 data-collapsed={sidebarCollapsed || undefined}
