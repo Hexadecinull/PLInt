@@ -718,9 +718,9 @@ export const ESOTERIC: LanguageDef[] = [
 
 
 // Convenience: build assembly entries with a shared template.
-function asm(id: string, name: string, ext: string, serverId?: string, sampleText?: string): LanguageDef {
+function asm(id: string, name: string, ext: string, serverId?: string, sampleText?: string, monacoLang = "plint-asm"): LanguageDef {
   return {
-    id, name, monaco: "plaintext", runtime: "server", serverId: serverId ?? id,
+    id, name, monaco: monacoLang, runtime: "server", serverId: serverId ?? id,
     ext, sample: sampleText ?? asmSample(name), group: "assembly",
     syntax: {
       comment: "; comment",
@@ -732,6 +732,7 @@ function asm(id: string, name: string, ext: string, serverId?: string, sampleTex
     },
   };
 }
+
 
 export const ASSEMBLY: LanguageDef[] = [
   asm("asm-x86_64", "x86-64 / x64 Assembly", ".s"),
