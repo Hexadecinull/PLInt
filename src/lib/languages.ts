@@ -750,9 +750,9 @@ export const ASSEMBLY: LanguageDef[] = [
   asm("asm-ppc", "PowerPC / POWER Assembly", ".s"),
   asm("asm-sparc", "SPARC Assembly", ".s"),
   asm("asm-s390", "IBM System/360 & z/Architecture Assembly", ".s"),
-  asm("asm-wat", "WebAssembly Text Format", ".wat", "wat", wat),
+  asm("asm-wat", "WebAssembly Text Format", ".wat", "wat", wat, "wat"),
   asm("asm-ebpf", "eBPF Assembly", ".ebpf"),
-  asm("asm-llvm", "LLVM Intermediate Representation", ".ll", "llvm", llvmIr),
+  asm("asm-llvm", "LLVM Intermediate Representation", ".ll", "llvm", llvmIr, "llvm-ir"),
   asm("asm-jasmin", "Java Bytecode / Jasmin Assembly", ".j", "jasmin", jasmin),
   asm("asm-cil", "CIL / MSIL", ".il", "cil", cil),
   asm("asm-intel", "Intel Syntax", ".asm"),
@@ -760,7 +760,26 @@ export const ASSEMBLY: LanguageDef[] = [
   asm("asm-nasm", "NASM", ".asm"),
   asm("asm-masm", "MASM", ".asm"),
   asm("asm-gas", "GNU Assembler (GAS)", ".s"),
+  // New — main set
+  asm("asm-sm83", "Game Boy / Sharp SM83 Assembly", ".asm"),
+  asm("asm-ia64", "IA-64 / Itanium Assembly", ".s"),
+  asm("asm-sh", "SuperH Assembly", ".s"),
+  asm("asm-alpha", "DEC Alpha Assembly", ".s"),
+  asm("asm-pdp11", "PDP-11 Assembly", ".mac"),
+  asm("asm-vax", "VAX Assembly", ".s"),
+  asm("asm-1802", "RCA 1802 COSMAC Assembly", ".asm"),
+  // Bonus — syntaxes & exotic
+  asm("asm-aarch64", "AArch64 Assembly", ".s"),
+  asm("asm-fasm", "FASM", ".asm"),
+  asm("asm-yasm", "YASM", ".asm"),
+  asm("asm-subleq", "Subleq / OISC Assembly", ".sq"),
+  // Extras
+  asm("asm-tasm", "TASM (Turbo Assembler)", ".asm"),
+  asm("asm-hla", "HLA (High-Level Assembly)", ".hla"),
+  asm("asm-tricore", "Infineon TriCore Assembly", ".s"),
+  asm("asm-hexagon", "Qualcomm Hexagon Assembly", ".s"),
 ];
+
 
 WEIRD.push(
   {
