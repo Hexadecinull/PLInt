@@ -81,10 +81,11 @@ export function setSettings(patch: Partial<Settings>) {
   write(next);
   listeners.forEach((l) => l(next));
   applyTheme(next.theme);
-  applyAccent(next.accent, next.deepAccent, next.theme);
+  applyAccent(next.accent, next.deepAccent, next.theme, next.customAccentHex);
   applyMotion(next.reducedMotion);
   applyDensity(next.density);
 }
+
 
 export function useSettings(): [Settings, (p: Partial<Settings>) => void] {
   const [s, setS] = useState<Settings>(DEFAULT_SETTINGS);
