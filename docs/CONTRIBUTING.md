@@ -35,7 +35,11 @@ machine's `PATH` will work.
 ## Code style
 
 - **TypeScript**, strict-ish — avoid `any` where a real type is easy to
-  write.
+  write. `typescript` is intentionally pinned to `^5.7.3`, not the newer
+  TypeScript 7 native compiler — `typescript-eslint` doesn't support TS7
+  yet (its peer range is `>=4.8.4 <6.1.0`, and installing past that with
+  `--force`/`--legacy-peer-deps` makes ESLint crash at runtime, not just
+  at install time). Revisit this once typescript-eslint adds TS7 support.
 - Run `npm run lint` and `npm run format` before committing; CI runs
   ESLint and a Prettier check on every push and PR (see
   `.github/workflows/lint.yml`).
