@@ -12,18 +12,27 @@ export interface SecretState {
 
 const DEFAULT: SecretState = { unlocked: false, enabled: [] };
 
+// In-memory cache: avoids a localStorage round-trip + JSON.parse on every
+// read, which otherwise happens twice per toggle (once in the caller, once
+// inside setSecretState) and adds up once the secret menu has 70+ rows.
+let cache: SecretState | null = null;
+
 function read(): SecretState {
+  if (cache) return cache;
   if (typeof window === "undefined") return DEFAULT;
+  let result: SecretState = DEFAULT;
   try {
     const raw = window.localStorage.getItem(KEY);
-    if (!raw) return DEFAULT;
-    return { ...DEFAULT, ...JSON.parse(raw) };
+    if (raw) result = { ...DEFAULT, ...JSON.parse(raw) };
   } catch {
-    return DEFAULT;
+    result = DEFAULT;
   }
+  cache = result;
+  return result;
 }
 
 function write(s: SecretState) {
+  cache = s;
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(KEY, JSON.stringify(s));

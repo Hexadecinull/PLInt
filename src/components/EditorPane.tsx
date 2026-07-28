@@ -97,7 +97,9 @@ export function EditorPane({ language, value, onChange }: Props) {
           wordWrap: settings.wordWrap ? "on" : "off",
           lineNumbers: settings.lineNumbers ? "on" : "off",
           tabSize: settings.tabSize,
-          smoothScrolling: true,
+          smoothScrolling: settings.smoothScrolling,
+          mouseWheelZoom: settings.mouseWheelZoom,
+          formatOnPaste: settings.formatOnPaste,
           cursorSmoothCaretAnimation: "on",
           cursorStyle: settings.cursorStyle,
           cursorBlinking: settings.cursorBlinking,
@@ -107,7 +109,8 @@ export function EditorPane({ language, value, onChange }: Props) {
           guides: { indentation: settings.indentGuides, bracketPairs: settings.bracketColorization },
           scrollBeyondLastLine: false,
           padding: { top: 12, bottom: 12 },
-          renderLineHighlight: "line",
+          renderLineHighlight: settings.renderLineHighlight,
+          rulers: settings.rulers ? [80] : [],
           automaticLayout: true,
         }}
       />

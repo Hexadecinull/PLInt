@@ -77,7 +77,7 @@ export function LanguageSidebar({ languages, active, onSelect }: Props) {
         </div>
         {list}
         <div className="border-t border-border px-3 py-2 font-mono text-[10px] leading-relaxed text-muted-foreground">
-          GPL-3.0 ·{" "}
+          AGPL-3.0 ·{" "}
           <a
             href="https://www.gnu.org/licenses/gpl-3.0.html"
             target="_blank"

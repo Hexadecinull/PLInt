@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { X, ArrowLeft } from "lucide-react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { X, ArrowLeft, Github } from "lucide-react";
 import { getServerEndpoint, setServerEndpoint } from "@/lib/runners";
 import { useSettings, type Settings } from "@/lib/settings";
 import { useAnimatedOpen } from "@/hooks/use-animated-open";
+import { useDialogs } from "@/lib/dialogs";
 import { ALL_LANGUAGES, WEIRD, ESOTERIC, ASSEMBLY, type LanguageDef } from "@/lib/languages";
 import { useSecretState, toggleSecretLanguage, setSecretState } from "@/lib/secret";
 
@@ -138,6 +139,7 @@ export function SettingsPanel({ open, onClose }: Props) {
                       <CustomColorPicker
                         hex={settings.customAccentHex ?? "#4dd0e1"}
                         onChange={(hex) => update({ accent: "custom", customAccentHex: hex })}
+                        onClose={() => setShowCustomPicker(false)}
                       />
                     )}
                   </Row>
@@ -202,12 +204,47 @@ export function SettingsPanel({ open, onClose }: Props) {
                   <Toggle label="Bracket pair colorization" checked={settings.bracketColorization} onChange={(v) => update({ bracketColorization: v })} />
                   <Toggle label="Sticky scroll" checked={settings.stickyScroll} onChange={(v) => update({ stickyScroll: v })} />
                   <Toggle label="Show whitespace" checked={settings.showWhitespace} onChange={(v) => update({ showWhitespace: v })} />
+                  <Toggle label="Smooth scrolling" checked={settings.smoothScrolling} onChange={(v) => update({ smoothScrolling: v })} />
+                  <Toggle label="Ctrl/Cmd + scroll to zoom" checked={settings.mouseWheelZoom} onChange={(v) => update({ mouseWheelZoom: v })} />
+                  <Toggle label="Format on paste" checked={settings.formatOnPaste} onChange={(v) => update({ formatOnPaste: v })} />
+                  <Toggle label="Ruler at column 80" checked={settings.rulers} onChange={(v) => update({ rulers: v })} />
+                  <Segmented
+                    label="Line highlight"
+                    value={settings.renderLineHighlight}
+                    options={[
+                      { id: "none", label: "None" },
+                      { id: "gutter", label: "Gutter" },
+                      { id: "line", label: "Line" },
+                      { id: "all", label: "All" },
+                    ]}
+                    onChange={(v) => update({ renderLineHighlight: v as Settings["renderLineHighlight"] })}
+                  />
                 </Section>
               </div>
 
               <div>
                 <Section title="Workspace">
                   <Toggle label="Auto-save buffers" checked={settings.autoSave} onChange={(v) => update({ autoSave: v })} />
+                  <Toggle label="Confirm before deleting files" checked={settings.confirmBeforeDelete} onChange={(v) => update({ confirmBeforeDelete: v })} />
+                  <Toggle label="Auto-run after you stop typing" checked={settings.autoRunOnChange} onChange={(v) => update({ autoRunOnChange: v })} />
+                  <Row label={`Terminal font size — ${settings.terminalFontSize}px`}>
+                    <input
+                      type="range" min={10} max={20} value={settings.terminalFontSize}
+                      onChange={(e) => update({ terminalFontSize: Number(e.target.value) })}
+                      className="w-full accent-primary"
+                    />
+                  </Row>
+                  <Row label="Default language on load">
+                    <select
+                      value={settings.defaultLanguage}
+                      onChange={(e) => update({ defaultLanguage: e.target.value })}
+                      className="w-full rounded-md border border-border bg-input px-2 py-1.5 font-mono text-xs outline-none focus:border-primary"
+                    >
+                      {ALL_LANGUAGES.map((l) => (
+                        <option key={l.id} value={l.id}>{l.name}</option>
+                      ))}
+                    </select>
+                  </Row>
                 </Section>
 
                 <Section title="Server-side execution">
@@ -255,7 +292,7 @@ export function SettingsPanel({ open, onClose }: Props) {
             >
               About
             </button>
-            {" \u00A0•\u00A0 PLInt v0.3"}
+            {" \u00A0•\u00A0 PLInt v0.4"}
           </div>
 
         </div>
@@ -265,6 +302,9 @@ export function SettingsPanel({ open, onClose }: Props) {
 }
 
 function SecretMenu({ enabled, onBack }: { enabled: string[]; onBack: () => void }) {
+  // A Set gives O(1) membership checks per row instead of each of the ~80
+  // rows scanning the whole `enabled` array on every render.
+  const enabledSet = useMemo(() => new Set(enabled), [enabled]);
   return (
     <div className="animate-fade-in">
       <div className="mb-4 flex items-center justify-between">
@@ -285,55 +325,127 @@ function SecretMenu({ enabled, onBack }: { enabled: string[]; onBack: () => void
         </button>
       </div>
 
-      <SecretGroup title="Weird languages" langs={WEIRD} enabled={enabled} />
-      <SecretGroup title="Esoteric languages" langs={ESOTERIC} enabled={enabled} />
-      <SecretGroup title="Assembly" langs={ASSEMBLY} enabled={enabled} />
+      <SecretGroup title="Weird languages" langs={WEIRD} enabledSet={enabledSet} />
+      <SecretGroup title="Esoteric languages" langs={ESOTERIC} enabledSet={enabledSet} />
+      <SecretGroup
+        title="Assembly"
+        langs={ASSEMBLY}
+        enabledSet={enabledSet}
+        trailing={<SubmitAssemblyRow />}
+      />
     </div>
   );
 }
 
 function SecretGroup({
-  title, langs, enabled,
-}: { title: string; langs: LanguageDef[]; enabled: string[] }) {
+  title, langs, enabledSet, trailing,
+}: { title: string; langs: LanguageDef[]; enabledSet: Set<string>; trailing?: React.ReactNode }) {
   return (
     <div className="mb-4">
       <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
         {title}
       </div>
       <ul className="grid gap-1.5 sm:grid-cols-2">
-        {langs.map((l) => {
-          const on = enabled.includes(l.id);
-          return (
-            <li key={l.id}>
-              <button
-                onClick={() => toggleSecretLanguage(l.id)}
-                className={
-                  "flex w-full items-center justify-between rounded-md border px-3 py-2 font-mono text-[12px] " +
-                  (on
-                    ? "border-primary/60 bg-primary/10 text-foreground"
-                    : "border-border bg-surface-2/60 text-muted-foreground hover:bg-surface-2")
-                }
-              >
-                <span className="flex min-w-0 items-center gap-2">
-                  <span className="truncate">{l.name}</span>
-                  <span className="shrink-0 text-[10px] text-muted-foreground/70">{l.ext}</span>
-                </span>
-                <span
-                  className={
-                    "shrink-0 text-[10px] uppercase tracking-wider " +
-                    (on ? "text-primary" : "text-muted-foreground/60")
-                  }
-                >
-                  {on ? "enabled" : "off"}
-                </span>
-              </button>
-            </li>
-          );
-        })}
+        {langs.map((l) => (
+          <SecretToggleRow key={l.id} lang={l} on={enabledSet.has(l.id)} />
+        ))}
+        {trailing && <li className="sm:col-span-2">{trailing}</li>}
       </ul>
     </div>
   );
 }
+
+// "Don't see your Assembly? Submit it now!" — spans the width of two
+// toggle buttons and walks through: prompt for a name, POST it to the
+// server, then tell the person whether it was new or already on file.
+// The submissions themselves are only readable from the server's own
+// terminal (see docs/DEPLOY.md) — nothing reads them back over HTTP.
+function SubmitAssemblyRow() {
+  const dialogs = useDialogs();
+  const [busy, setBusy] = useState(false);
+
+  const handleSubmit = async () => {
+    const name = await dialogs.prompt(
+      "What's the name of the Assembly variant you'd like to see supported?",
+      "",
+      { title: "submit an assembly variant", confirmLabel: "send" }
+    );
+    const trimmed = name?.trim();
+    if (!trimmed) return;
+
+    setBusy(true);
+    try {
+      const res = await fetch("/api/submit-assembly", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed }),
+      });
+      const data = await res.json().catch(() => ({ status: "error" as const }));
+      if (data.status === "duplicate") {
+        await dialogs.alert(`"${trimmed}" is already on the list — thanks anyway!`, {
+          title: "already submitted",
+        });
+      } else if (data.status === "ok") {
+        await dialogs.alert(`Thanks! "${trimmed}" was submitted for consideration.`, {
+          title: "submitted",
+        });
+      } else {
+        await dialogs.alert("Couldn't submit that right now. Please try again later.", {
+          title: "submission failed",
+        });
+      }
+    } catch {
+      await dialogs.alert("Couldn't reach the server. Please try again later.", {
+        title: "submission failed",
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleSubmit}
+      disabled={busy}
+      className="flex w-full items-center justify-center rounded-md border border-dashed border-primary/50 bg-primary/5 px-3 py-2.5 font-mono text-[12px] text-primary hover:bg-primary/10 disabled:opacity-60"
+    >
+      {busy ? "Submitting…" : "Don't see your Assembly? Submit it now!"}
+    </button>
+  );
+}
+
+// Memoized so a toggle click only re-renders the one row whose `on` prop
+// actually changed, instead of every language button in the secret menu.
+const SecretToggleRow = memo(function SecretToggleRow({
+  lang, on,
+}: { lang: LanguageDef; on: boolean }) {
+  return (
+    <li>
+      <button
+        onClick={() => toggleSecretLanguage(lang.id)}
+        className={
+          "flex w-full items-center justify-between rounded-md border px-3 py-2 font-mono text-[12px] " +
+          (on
+            ? "border-primary/60 bg-primary/10 text-foreground"
+            : "border-border bg-surface-2/60 text-muted-foreground hover:bg-surface-2")
+        }
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="truncate">{lang.name}</span>
+          <span className="shrink-0 text-[10px] text-muted-foreground/70">{lang.ext}</span>
+        </span>
+        <span
+          className={
+            "shrink-0 text-[10px] uppercase tracking-wider " +
+            (on ? "text-primary" : "text-muted-foreground/60")
+          }
+        >
+          {on ? "enabled" : "off"}
+        </span>
+      </button>
+    </li>
+  );
+});
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -434,20 +546,30 @@ function AboutView({ onBack }: { onBack: () => void }) {
         </button>
       </div>
 
-      <div className="mb-5 flex items-center gap-3">
-        <div className="grid h-12 w-12 place-items-center rounded-md border border-primary/50 bg-primary/10 text-primary text-lg">
-          {"{;}"}
-        </div>
-        <div>
-          <div className="text-[15px] font-semibold text-foreground">PLInt</div>
-          <div className="text-[11px] text-muted-foreground">
-            Programming Language Interpreter Hub — v0.3
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="grid h-12 w-12 place-items-center rounded-md border border-primary/50 bg-primary/10 font-mono text-lg text-primary">
+            {"$_"}
+          </div>
+          <div>
+            <div className="text-[15px] font-semibold text-foreground">PLInt</div>
+            <div className="text-[11px] text-muted-foreground">
+              Programming Language Interpreter Hub — v0.4
+            </div>
           </div>
         </div>
+        <a
+          href="https://github.com/Hexadecinull/PLInt"
+          target="_blank"
+          rel="noreferrer noopener"
+          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 py-1.5 text-[11px] hover:bg-surface-3"
+        >
+          <Github className="h-3.5 w-3.5" /> Repo
+        </a>
       </div>
 
       <AboutSection title="Authors">
-        Built with the PLInt team on Lovable.
+        Originally scaffolded with Lovable, since extended and self-hosted independently.
       </AboutSection>
 
       <AboutSection title="Coded in">
@@ -497,79 +619,154 @@ function AboutSection({ title, children }: { title: string; children: React.Reac
   );
 }
 
-function CustomColorPicker({
-  hex, onChange,
-}: { hex: string; onChange: (hex: string) => void }) {
-  const parsed = /^#?([0-9a-fA-F]{6})$/.exec(hex.trim());
-  const [text, setText] = useState(parsed ? "#" + parsed[1].toLowerCase() : "#4dd0e1");
+function hsvToHex(h: number, s: number, v: number): string {
+  s /= 100;
+  v /= 100;
+  const c = v * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = v - c;
+  let r = 0, g = 0, b = 0;
+  if (h < 60) [r, g, b] = [c, x, 0];
+  else if (h < 120) [r, g, b] = [x, c, 0];
+  else if (h < 180) [r, g, b] = [0, c, x];
+  else if (h < 240) [r, g, b] = [0, x, c];
+  else if (h < 300) [r, g, b] = [x, 0, c];
+  else [r, g, b] = [c, 0, x];
+  const to = (n: number) => Math.round((n + m) * 255).toString(16).padStart(2, "0");
+  return `#${to(r)}${to(g)}${to(b)}`;
+}
 
-  // Simple hue slider + hex input. Circle is positioned via a linear
-  // horizontal hue bar (0–360°); intuitive without needing a full square.
-  const hue = (() => {
-    const m = /^#?([0-9a-fA-F]{6})$/.exec(text);
-    if (!m) return 190;
-    const n = parseInt(m[1], 16);
-    const r = ((n >> 16) & 255) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
-    if (max === min) return 0;
-    const d = max - min;
-    let h = 0;
-    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0));
+function hexToHsv(hex: string): { h: number; s: number; v: number } | null {
+  const m = /^#?([0-9a-fA-F]{6})$/.exec(hex.trim());
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  const r = ((n >> 16) & 255) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const d = max - min;
+  let h = 0;
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d) % 6;
     else if (max === g) h = (b - r) / d + 2;
     else h = (r - g) / d + 4;
-    return h * 60;
-  })();
+    h *= 60;
+    if (h < 0) h += 360;
+  }
+  const s = max === 0 ? 0 : d / max;
+  return { h, s: s * 100, v: max * 100 };
+}
 
-  const hueToHex = (h: number) => {
-    const s = 0.7, l = 0.55;
-    const c = (1 - Math.abs(2 * l - 1)) * s;
-    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-    const m = l - c / 2;
-    let r = 0, g = 0, b = 0;
-    if (h < 60) [r, g, b] = [c, x, 0];
-    else if (h < 120) [r, g, b] = [x, c, 0];
-    else if (h < 180) [r, g, b] = [0, c, x];
-    else if (h < 240) [r, g, b] = [0, x, c];
-    else if (h < 300) [r, g, b] = [x, 0, c];
-    else [r, g, b] = [c, 0, x];
-    const to = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, "0");
-    return `#${to(r)}${to(g)}${to(b)}`;
+function CustomColorPicker({
+  hex, onChange, onClose,
+}: { hex: string; onChange: (hex: string) => void; onClose?: () => void }) {
+  const initial = hexToHsv(hex) ?? { h: 200, s: 70, v: 90 };
+  const [h, setH] = useState(initial.h);
+  const [s, setS] = useState(initial.s);
+  const [v, setV] = useState(initial.v);
+  const draftHex = hsvToHex(h, s, v);
+  const [text, setText] = useState(draftHex);
+  const svRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => setText(draftHex), [h, s, v]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const setFromPointer = (clientX: number, clientY: number) => {
+    const el = svRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = Math.min(Math.max(clientX - rect.left, 0), rect.width);
+    const y = Math.min(Math.max(clientY - rect.top, 0), rect.height);
+    setS((x / rect.width) * 100);
+    setV(100 - (y / rect.height) * 100);
   };
 
-  const commit = (v: string) => {
-    setText(v);
-    if (/^#?([0-9a-fA-F]{6})$/.test(v)) onChange(v.startsWith("#") ? v : "#" + v);
+  const commitHexText = (val: string) => {
+    setText(val);
+    const parsed = hexToHsv(val);
+    if (parsed) {
+      setH(parsed.h);
+      setS(parsed.s);
+      setV(parsed.v);
+    }
+  };
+
+  const apply = () => {
+    const final = hexToHsv(text) ? text : draftHex;
+    onChange(final.startsWith("#") ? final : `#${final}`);
   };
 
   return (
-    <div className="mt-2 rounded-md border border-border bg-surface-2/60 p-3">
+    <div className="mt-2 rounded-md border border-border bg-popover p-3 shadow-[var(--shadow-panel)]">
+      <div className="mb-3 flex items-center justify-between">
+        <span className="font-mono text-[11px] uppercase tracking-widest text-primary">
+          Custom Color
+        </span>
+        {onClose && (
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="rounded p-1 text-muted-foreground hover:bg-surface-2 hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
+      </div>
+
       <div
-        className="relative mb-2 h-3 w-full rounded-full"
+        ref={svRef}
+        onPointerDown={(e) => {
+          (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+          setFromPointer(e.clientX, e.clientY);
+        }}
+        onPointerMove={(e) => {
+          if (e.buttons !== 1) return;
+          setFromPointer(e.clientX, e.clientY);
+        }}
+        className="relative mb-3 h-36 w-full cursor-crosshair touch-none rounded-md border border-border"
+        style={{
+          background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent), hsl(${h}, 100%, 50%)`,
+        }}
+      >
+        <div
+          className="pointer-events-none absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow"
+          style={{ left: `${s}%`, top: `${100 - v}%`, background: draftHex }}
+        />
+      </div>
+
+      <div
+        className="relative mb-3 h-3 w-full rounded-full"
         style={{
           background:
             "linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)",
         }}
       >
         <input
-          type="range" min={0} max={360} step={1} value={Math.round(hue)}
-          onChange={(e) => commit(hueToHex(Number(e.target.value)))}
+          type="range" min={0} max={360} step={1} value={Math.round(h)}
+          onChange={(e) => setH(Number(e.target.value))}
           className="absolute inset-0 h-3 w-full cursor-pointer appearance-none bg-transparent [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-transparent [&::-webkit-slider-thumb]:shadow"
           aria-label="Hue"
         />
       </div>
-      <div className="flex items-center gap-2">
-        <div
-          className="h-6 w-6 shrink-0 rounded-md border border-border"
-          style={{ background: /^#?([0-9a-fA-F]{6})$/.test(text) ? (text.startsWith("#") ? text : "#" + text) : "#000" }}
-        />
+
+      <div className="mb-3 flex items-center gap-2">
         <input
           type="text"
           value={text}
-          onChange={(e) => commit(e.target.value)}
+          onChange={(e) => commitHexText(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") apply(); }}
           placeholder="#4dd0e1"
-          className="w-full rounded-md border border-border bg-input px-2 py-1 font-mono text-[11px] outline-none focus:border-primary"
+          className="w-full rounded-md border border-border bg-input px-2 py-1.5 text-center font-mono text-[12px] outline-none focus:border-primary"
+        />
+        <div
+          className="h-8 w-8 shrink-0 rounded-md border border-border"
+          style={{ background: draftHex }}
         />
       </div>
+
+      <button
+        onClick={apply}
+        className="w-full rounded-md bg-primary px-3 py-2 font-mono text-[12px] font-medium text-primary-foreground hover:bg-primary/90"
+      >
+        Apply Color
+      </button>
     </div>
   );
 }

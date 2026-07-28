@@ -298,6 +298,52 @@ export async function runHtml(code: string): Promise<RunResult> {
   return res;
 }
 
+// -------- CoffeeScript (compile → JS, then run like JS) --------
+
+export async function runCoffeeScript(code: string): Promise<RunResult> {
+  const start = performance.now();
+  const coffee = await once<any>("coffeescript", async () => {
+    const mod = await cdnImport("https://esm.sh/coffeescript@2.7.0");
+    return mod.default ?? mod;
+  });
+  try {
+    const js = coffee.compile(code, { bare: true });
+    const result = await runJs(js);
+    result.durationMs = performance.now() - start;
+    return result;
+  } catch (e) {
+    const res = emptyResult();
+    res.ok = false;
+    res.stderr = formatError(e);
+    res.durationMs = performance.now() - start;
+    return res;
+  }
+}
+
+// -------- Markdown (sanitized live HTML preview, same pathway as HTML) --------
+
+export async function runMarkdown(code: string): Promise<RunResult> {
+  const res = emptyResult();
+  const start = performance.now();
+  try {
+    const [markedMod, dompurifyMod] = await Promise.all([
+      once<any>("marked", () => cdnImport("https://esm.sh/marked@13.0.3")),
+      once<any>("dompurify", () => cdnImport("https://esm.sh/dompurify@3.1.6")),
+    ]);
+    const marked = markedMod.marked ?? markedMod.default ?? markedMod;
+    const DOMPurify = dompurifyMod.default ?? dompurifyMod;
+    const rawHtml = await marked.parse(code, { breaks: true, gfm: true });
+    res.html = DOMPurify.sanitize(rawHtml);
+    res.stdout = "(rendered preview above)";
+    res.ok = true;
+  } catch (e) {
+    res.ok = false;
+    res.stderr = formatError(e);
+  }
+  res.durationMs = performance.now() - start;
+  return res;
+}
+
 // -------- Brainfuck (30k-cell tape, in-browser) --------
 
 export async function runBrainfuck(code: string): Promise<RunResult> {

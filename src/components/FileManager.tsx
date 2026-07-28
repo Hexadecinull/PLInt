@@ -19,6 +19,8 @@ import {
   type SavedFile,
 } from "@/lib/files";
 import { useAnimatedOpen } from "@/hooks/use-animated-open";
+import { useDialogs } from "@/lib/dialogs";
+import { useSettings } from "@/lib/settings";
 
 interface Props {
   open: boolean;
@@ -43,6 +45,8 @@ export function FileManager({
   const [name, setName] = useState("");
   const [tick, setTick] = useState(0);
   const { mounted, state } = useAnimatedOpen(open);
+  const dialogs = useDialogs();
+  const [settings] = useSettings();
 
   useEffect(() => {
     if (open) setFiles(listFiles(language.id));
@@ -96,10 +100,10 @@ export function FileManager({
       const text = await file.text();
       try {
         const n = importAll(text);
-        alert(`Imported ${n} files.`);
+        await dialogs.alert(`Imported ${n} files.`, { title: "import" });
         setTick((t) => t + 1);
       } catch {
-        alert("Invalid file.");
+        await dialogs.alert("Invalid file.", { title: "import" });
       }
     };
     input.click();
@@ -190,14 +194,21 @@ export function FileManager({
                         {new Date(f.updatedAt).toLocaleString()}
                       </span>
                     </button>
-                    <IconMini onClick={() => {
-                      const n = prompt("New name", f.name);
+                    <IconMini onClick={async () => {
+                      const n = await dialogs.prompt("New name for this file:", f.name, { title: "rename file" });
                       if (n) { renameFile(f.id, n); setTick((t) => t + 1); }
                     }} label="Rename"><Pencil className="h-3.5 w-3.5" /></IconMini>
                     <IconMini onClick={() => handleDownload(f)} label="Download"><Download className="h-3.5 w-3.5" /></IconMini>
                     <IconMini
-                      onClick={() => {
-                        if (confirm(`Delete "${f.name}"?`)) {
+                      onClick={async () => {
+                        const ok = settings.confirmBeforeDelete
+                          ? await dialogs.confirm(`Delete "${f.name}"? This can't be undone.`, {
+                              title: "delete file",
+                              confirmLabel: "delete",
+                              danger: true,
+                            })
+                          : true;
+                        if (ok) {
                           deleteFile(f.id);
                           setTick((t) => t + 1);
                         }

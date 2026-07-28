@@ -26,7 +26,17 @@ export interface Settings {
   density: "compact" | "comfortable";
   reducedMotion: boolean;
   customAccentHex?: string;
-
+  // Editor — added for finer control over Monaco's feel.
+  smoothScrolling: boolean;
+  mouseWheelZoom: boolean;
+  formatOnPaste: boolean;
+  renderLineHighlight: "none" | "gutter" | "line" | "all";
+  rulers: boolean;
+  // Workspace — behavior of the app shell itself, not just the editor.
+  confirmBeforeDelete: boolean;
+  autoRunOnChange: boolean;
+  defaultLanguage: string;
+  terminalFontSize: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -48,6 +58,15 @@ export const DEFAULT_SETTINGS: Settings = {
   indentGuides: true,
   density: "comfortable",
   reducedMotion: false,
+  smoothScrolling: true,
+  mouseWheelZoom: false,
+  formatOnPaste: false,
+  renderLineHighlight: "line",
+  rulers: false,
+  confirmBeforeDelete: true,
+  autoRunOnChange: false,
+  defaultLanguage: "python",
+  terminalFontSize: 13,
 };
 
 function read(): Settings {

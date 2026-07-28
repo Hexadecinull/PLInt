@@ -10,8 +10,8 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { applyAccent, applyDensity, applyMotion, applyTheme, getSettings } from "@/lib/settings";
+import { DialogsProvider } from "@/lib/dialogs";
 
 function NotFoundComponent() {
   return (
@@ -38,9 +38,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -82,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Run 17 programming languages online with full syntax highlighting and instant execution. No accounts, no installs. Open source (GPL-3.0).",
+          "Run 125+ programming languages online with full syntax highlighting and instant execution. No accounts, no installs. Open source (AGPL-3.0).",
       },
       { name: "author", content: "PLInt" },
       { property: "og:type", content: "website" },
@@ -122,15 +119,17 @@ function RootComponent() {
   useEffect(() => {
     const cfg = getSettings();
     applyTheme(cfg.theme);
-    applyAccent(cfg.accent, cfg.deepAccent, cfg.theme);
+    applyAccent(cfg.accent, cfg.deepAccent, cfg.theme, cfg.customAccentHex);
     applyMotion(cfg.reducedMotion);
     applyDensity(cfg.density);
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <DialogsProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </DialogsProvider>
     </QueryClientProvider>
   );
 }

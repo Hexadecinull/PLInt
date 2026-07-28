@@ -1,4 +1,5 @@
 import type { RunResult } from "@/lib/runners";
+import { useSettings } from "@/lib/settings";
 
 interface Props {
   running: boolean;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function OutputPane({ running, result, onClear }: Props) {
+  const [settings] = useSettings();
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-md border border-border bg-[oklch(0.10_0.005_240)] font-mono">
       {/* Terminal chrome */}
@@ -35,11 +37,11 @@ export function OutputPane({ running, result, onClear }: Props) {
         </button>
       </div>
 
-      {/* Optional HTML preview (for HTML runtime) */}
+      {/* Optional rendered preview (HTML and Markdown runtimes) */}
       {result?.html !== undefined && (
         <div className="border-b border-border bg-white">
           <iframe
-            title="HTML preview"
+            title="Preview"
             srcDoc={result.html}
             sandbox="allow-scripts allow-modals allow-forms"
             className="h-56 w-full"
@@ -47,29 +49,32 @@ export function OutputPane({ running, result, onClear }: Props) {
         </div>
       )}
 
-      <div className="scroll-slim flex-1 overflow-auto px-3 py-2 text-[13px] leading-relaxed">
+      <div
+        className="scroll-slim flex-1 overflow-auto px-3 py-2 leading-relaxed"
+        style={{ fontSize: `${settings.terminalFontSize}px` }}
+      >
         {!result && !running && (
-          <div className="text-muted-foreground">
-            <span className="text-terminal-green">user@plint</span>
-            <span className="text-muted-foreground">:</span>
+          <div className="text-terminal-dim">
+            <span className="text-terminal-accent">user@plint</span>
+            <span className="text-terminal-dim">:</span>
             <span className="text-primary">~</span>
-            <span className="text-muted-foreground">$ </span>
+            <span className="text-terminal-dim">$ </span>
             press{" "}
             <kbd className="rounded border border-border bg-surface-2 px-1 py-0.5 text-[10px]">
               Ctrl + Enter
             </kbd>{" "}
             to run
-            <span className="ml-1 inline-block h-[1em] w-[0.55em] translate-y-0.5 bg-foreground/70 animate-caret" />
+            <span className="ml-1 inline-block h-[1em] w-[0.55em] translate-y-0.5 bg-terminal-fg/70 animate-caret" />
           </div>
         )}
 
         {(running || result) && (
           <div className="mb-1">
-            <span className="text-terminal-green">user@plint</span>
-            <span className="text-muted-foreground">:</span>
+            <span className="text-terminal-accent">user@plint</span>
+            <span className="text-terminal-dim">:</span>
             <span className="text-primary">~</span>
-            <span className="text-muted-foreground">$ </span>
-            <span className="text-foreground/90">./run</span>
+            <span className="text-terminal-dim">$ </span>
+            <span className="text-terminal-fg/90">./run</span>
           </div>
         )}
 
@@ -84,7 +89,7 @@ export function OutputPane({ running, result, onClear }: Props) {
                     ? "border-destructive text-destructive"
                     : d.severity === "warning"
                     ? "border-warning text-warning"
-                    : "border-border text-muted-foreground")
+                    : "border-border text-terminal-dim")
                 }
               >
                 <span className="uppercase tracking-wider text-[10px] opacity-70">
@@ -106,22 +111,22 @@ export function OutputPane({ running, result, onClear }: Props) {
         )}
 
         {result?.stdout && (
-          <pre className="whitespace-pre-wrap text-foreground">{result.stdout}</pre>
+          <pre className="whitespace-pre-wrap text-terminal-fg">{result.stdout}</pre>
         )}
         {result?.stderr && (
           <pre className="mt-1 whitespace-pre-wrap text-destructive">{result.stderr}</pre>
         )}
         {result && !result.stdout && !result.stderr && !result.diagnostics.length && !result.html && (
-          <div className="text-muted-foreground">(no output)</div>
+          <div className="text-terminal-dim">(no output)</div>
         )}
 
         {result && !running && (
-          <div className="mt-2 text-muted-foreground">
-            <span className="text-terminal-green">user@plint</span>
-            <span className="text-muted-foreground">:</span>
+          <div className="mt-2 text-terminal-dim">
+            <span className="text-terminal-accent">user@plint</span>
+            <span className="text-terminal-dim">:</span>
             <span className="text-primary">~</span>
-            <span className="text-muted-foreground">$ </span>
-            <span className="inline-block h-[1em] w-[0.55em] translate-y-0.5 bg-foreground/70 animate-caret" />
+            <span className="text-terminal-dim">$ </span>
+            <span className="inline-block h-[1em] w-[0.55em] translate-y-0.5 bg-terminal-fg/70 animate-caret" />
           </div>
         )}
       </div>

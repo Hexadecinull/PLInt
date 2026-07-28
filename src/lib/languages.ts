@@ -9,6 +9,8 @@ export type RuntimeKind =
   | "ruby"
   | "php"
   | "html"
+  | "markdown"
+  | "coffeescript"
   | "brainfuck"
   | "server";
 
@@ -624,6 +626,104 @@ CORE.push(
     syntax: { comment: ";; comment", variable: "(defvar x 10)", fn: "(defun f (x) ...)", io: "(format t \"~a\" x)", loop: "(dotimes (i n) ...)", conditional: "(if (> x 0) ... ...)" } },
 );
 
+// ---------------- more core (2026 batch) ----------------
+const coffee = `# CoffeeScript — PLInt
+greet = (name) -> "Hello, #{name}!"
+console.log greet "world ##{i}" for i in [0...3]
+`;
+const actionscript = `// ActionScript 3 — PLInt
+package {
+  public class Hello {
+    public function Hello() {
+      for (var i:int = 0; i < 3; i++) trace("Hello #" + i);
+    }
+  }
+}
+`;
+const matlab = `% MATLAB / Octave — PLInt
+function greet(name)
+  fprintf("Hello, %s!\\n", name);
+end
+for i = 0:2
+  greet(sprintf("world #%d", i));
+end
+`;
+const ada = `-- Ada — PLInt
+with Ada.Text_IO; use Ada.Text_IO;
+procedure Hello is
+begin
+  for I in 0 .. 2 loop
+    Put_Line("Hello #" & Integer'Image(I));
+  end loop;
+end Hello;
+`;
+const pascal = `{ Pascal — PLInt }
+program Hello;
+var i: integer;
+begin
+  for i := 0 to 2 do
+    writeln('Hello #', i);
+end.
+`;
+const smalltalk = `"Smalltalk — PLInt"
+1 to: 3 do: [:i | Transcript showCr: 'Hello #', i printString].
+`;
+const mojo = `# Mojo — PLInt
+fn greet(name: String) -> String:
+    return "Hello, " + name + "!"
+
+fn main():
+    for i in range(3):
+        print(greet("world #" + String(i)))
+`;
+const markdown = `# Markdown — PLInt
+
+A **live preview** renders below, just like the HTML runtime.
+
+- Bullet one
+- Bullet two
+
+\`\`\`
+code block
+\`\`\`
+
+> Rendered client-side with a sandboxed, sanitized HTML preview.
+`;
+const groovy = `// Groovy — PLInt
+def greet(name) { "Hello, \${name}!" }
+(0..2).each { i -> println greet("world #\${i}") }
+`;
+
+CORE.push(
+  { id: "coffeescript", name: "CoffeeScript", monaco: "coffeescript", runtime: "coffeescript",
+    ext: ".coffee", sample: coffee,
+    syntax: { comment: "# comment", variable: "x = 10", fn: "f = (x) -> x + 1", io: "console.log x", loop: "for i in [0...n]", conditional: "if x > 0 then ... else ..." } },
+  { id: "actionscript", name: "ActionScript", monaco: "actionscript", runtime: "server", serverId: "actionscript",
+    ext: ".as", sample: actionscript,
+    syntax: { comment: "// comment", variable: "var x:int = 10;", fn: "function f(x:int):int { ... }", io: "trace(x);", loop: "for (var i:int=0;i<n;i++)", conditional: "if (x > 0) { ... }" } },
+  { id: "matlab", name: "MATLAB", monaco: "matlab", runtime: "server", serverId: "matlab",
+    ext: ".m", sample: matlab,
+    syntax: { comment: "% comment", variable: "x = 10;", fn: "function y = f(x) ... end", io: "fprintf(\"%d\", x);", loop: "for i = 1:n ... end", conditional: "if x > 0 ... end" } },
+  { id: "ada", name: "Ada", monaco: "ada", runtime: "server", serverId: "ada",
+    ext: ".adb", sample: ada,
+    syntax: { comment: "-- comment", variable: "X : Integer := 10;", fn: "function F (X : Integer) return Integer is ...", io: "Put_Line(...)", loop: "for I in 0 .. N loop ... end loop;", conditional: "if X > 0 then ... end if;" } },
+  { id: "pascal", name: "Pascal", monaco: "pascal", runtime: "server", serverId: "pascal",
+    ext: ".pas", sample: pascal,
+    syntax: { comment: "{ comment }", variable: "var x: integer;", fn: "function f(x: integer): integer; ...", io: "writeln(x);", loop: "for i := 0 to n do ...", conditional: "if x > 0 then ... else ..." } },
+  { id: "smalltalk", name: "Smalltalk", monaco: "smalltalk", runtime: "server", serverId: "smalltalk",
+    ext: ".st", sample: smalltalk,
+    syntax: { comment: "\"comment\"", variable: "x := 10.", fn: "f: x ^x + 1", io: "Transcript showCr: x printString.", loop: "1 to: n do: [:i | ...]", conditional: "x > 0 ifTrue: [...] ifFalse: [...]" } },
+  { id: "mojo", name: "Mojo", monaco: "python", runtime: "server", serverId: "mojo",
+    ext: ".mojo", sample: mojo,
+    syntax: { comment: "# comment", variable: "var x: Int = 10", fn: "fn f(x: Int) -> Int: ...", io: "print(x)", loop: "for i in range(n): ...", conditional: "if x > 0: ... else: ..." } },
+  { id: "markdown", name: "Markdown", monaco: "markdown", runtime: "markdown",
+    ext: ".md", sample: markdown,
+    syntax: { comment: "<!-- comment -->", variable: "n/a", fn: "n/a", io: "renders as HTML preview", loop: "n/a", conditional: "n/a" } },
+  { id: "groovy", name: "Groovy", monaco: "groovy", runtime: "server", serverId: "groovy",
+    ext: ".groovy", sample: groovy,
+    syntax: { comment: "// comment", variable: "def x = 10", fn: "def f(x) { x + 1 }", io: "println x", loop: "(0..<n).each { i -> ... }", conditional: "if (x > 0) { ... } else { ... }" } },
+);
+
 
 // ---------------- weird / esoteric extras ----------------
 
@@ -638,18 +738,14 @@ const makefile = `# Makefile — PLInt
 all:
 \t@for i in 1 2 3; do echo "Hello #$$i"; done
 `;
-const whitespace = `   \t\n\t\n \t\n  \t\t \t\t  \n\t\n  \n\n\n`;
+const whitespace = `   \t  \t   \n\t\n     \t\t \t  \t\n\t\n     \t \t \n\t\n  \n\n\n`;
 const binaryLang = `01001000 01100101 01101100 01101100 01101111 00100001
 ; Binary — each 8-bit byte is one ASCII character.
 `;
 const malbolgeU = `('&%:9]!~}|z2Vxwv-,POqponl$Hjig%eB@@>}=<M:9wv6WsU2T|nm-,jcL(I&%$#"
 ; Malbolge Unshackled — same encrypted opcodes, unbounded tape width.
 `;
-const befunge = `>              v
-v  ,,,,,"Hello"<
->25*,          v
-,,,,,,"World!",<
-@`;
+const befunge = `"!dlroW ,olleH",,,,,,,,,,,,,@`;
 const piet = `# Piet — PLInt
 # Piet is a 2D visual language; source is an image of colored codels.
 # This text placeholder is for reference only — real programs are PNG images.
@@ -677,8 +773,10 @@ Pour contents of the mixing bowl into the baking dish.
 
 Serves 1.
 `;
-const ook = `Ook. Ook? Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.
-Ook? Ook. Ook. Ook? Ook! Ook? Ook! Ook. Ook.
+const ook = `Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook. Ook! Ook? Ook. Ook? Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook? Ook. Ook! Ook! Ook? Ook! Ook. Ook? Ook! Ook.
 `;
 const deadfish = `iiisiiiiiiiiioiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiio
 `;
@@ -687,9 +785,14 @@ const svelteAsm = ""; // placeholder unused
 
 // ---------- ASSEMBLY sample (shared, small) ----------
 const asmSample = (title: string) => `; ${title} — PLInt sample
-; Replace with your own program. Server executes via serverId.
-    mov     eax, 1
-    ret
+; Runs on PLInt's shared assembly simulator (see docs/ARCHITECTURE.md)
+    mov     r0, 3
+loop:
+    prints  "Hello from ${title}!"
+    sub     r0, 1
+    cmp     r0, 0
+    jg      loop
+    halt
 `;
 const wat = `;; WebAssembly Text Format — PLInt
 (module
@@ -872,6 +975,17 @@ export const ASSEMBLY: LanguageDef[] = [
   asm("asm-hla", "HLA (High-Level Assembly)", ".hla"),
   asm("asm-tricore", "Infineon TriCore Assembly", ".s"),
   asm("asm-hexagon", "Qualcomm Hexagon Assembly", ".s"),
+  // Requested batch — historical, embedded and vendor architectures
+  asm("asm-cdc6600", "CDC 6000 / 6600 Assembly", ".asm"),
+  asm("asm-univac1100", "UNIVAC 1100/2200 Assembly", ".asm"),
+  asm("asm-sgi-irix", "SGI MIPS / IRIX Assembly", ".s"),
+  asm("asm-8051", "Atmel 8051 Assembly", ".asm"),
+  asm("asm-msp430", "Texas Instruments MSP430 Assembly", ".s"),
+  asm("asm-tms320c6000", "TI TMS320C6000 DSP Assembly", ".asm"),
+  asm("asm-pic32", "Microchip PIC32 Assembly", ".s"),
+  asm("asm-i860-i960", "Intel i860 / i960 Assembly", ".s"),
+  asm("asm-crusoe", "Transmeta Crusoe Code Morphing Assembly", ".s"),
+  asm("asm-agc", "Apollo Guidance Computer Assembly", ".agc"),
 ];
 
 

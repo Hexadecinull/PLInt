@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Run 60+ programming languages online — Python, JavaScript, TypeScript, Java, C#, F#, Rust, Go, Ruby, Swift, Julia, Elixir, Nim, HTML, Scala, Clojure, Erlang, Assembly and more. No accounts, no installs. Open source (GPL-3.0).",
+          "Run 125+ programming languages online — Python, JavaScript, TypeScript, Java, C#, F#, Rust, Go, Ruby, Swift, Julia, Elixir, Nim, HTML, Scala, Clojure, Erlang, Assembly and more. No accounts, no installs. Open source (AGPL-3.0).",
       },
       { property: "og:title", content: "PLInt — Online Interpreter Hub" },
       {
@@ -80,10 +80,10 @@ function Welcome() {
             rel="noreferrer"
             className="hover:text-foreground"
           >
-            GPL-3.0
+            AGPL-3.0
           </a>
           <a
-            href="https://github.com"
+            href="https://github.com/Hexadecinull/PLInt"
             target="_blank"
             rel="noreferrer"
             aria-label="Source"
@@ -154,7 +154,7 @@ function Welcome() {
           target="_blank"
           rel="noreferrer"
         >
-          GPL-3.0 License
+          AGPL-3.0 License
         </a>
       </footer>
     </div>

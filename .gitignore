@@ -16,9 +16,15 @@ dist-ssr
 .nitro
 *.local
 
-# Wrangler / Cloudflare
-.wrangler/
-.dev.vars
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Self-hosting runtime data (see docs/DEPLOY.md)
+assembly-submissions.txt
+*.pid
+logs/
 
 # Editor directories and files
 .vscode/*

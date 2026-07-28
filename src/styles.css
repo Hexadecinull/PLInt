@@ -39,6 +39,9 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-terminal-green: var(--terminal-green);
+  --color-terminal-fg: var(--terminal-fg);
+  --color-terminal-dim: var(--terminal-dim);
+  --color-terminal-accent: var(--terminal-accent);
   --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
@@ -75,6 +78,13 @@
   --border: oklch(0.24 0.006 240);
   --input: oklch(0.22 0.006 240);
   --ring: oklch(0.82 0.14 185);
+
+  /* The output terminal (OutputPane) always renders on a fixed dark
+     background, in both light and dark app themes, so its text needs
+     its own tokens instead of the theme-following --foreground family. */
+  --terminal-fg: oklch(0.94 0.005 240);
+  --terminal-dim: oklch(0.62 0.008 240);
+  --terminal-accent: oklch(0.82 0.18 145);
 
   --gradient-brand: linear-gradient(135deg, var(--primary), var(--accent));
   --gradient-panel: linear-gradient(180deg, var(--surface-2), var(--surface));
@@ -284,15 +294,13 @@ button, a, input, select, textarea {
     transform var(--dur-fast) var(--ease);
 }
 
-/* Sidebar collapse/expand animation: transition flex only during a brief
-   window (~280ms) after toggling, so drag-resize stays instant. */
+/* Sidebar collapse/expand animation: applied imperatively (via elementRef,
+   see routes/app.tsx) directly to the Panel's real flex-sized root element,
+   only for a brief window (~280ms) after toggling, so drag-resize stays
+   instant the rest of the time. */
 .sidebar-anim {
-  transition: flex 260ms cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-.sidebar-anim > div[data-sidebar-inner] {
-  transition: opacity 220ms var(--ease);
-}
-.sidebar-anim[style*="flex-grow: 0"] > div[data-sidebar-inner],
-.sidebar-anim[data-panel-size="0.0"] > div[data-sidebar-inner] {
-  opacity: 0;
+  transition:
+    flex-grow 260ms cubic-bezier(0.4, 0, 0.2, 1),
+    flex-basis 260ms cubic-bezier(0.4, 0, 0.2, 1),
+    flex 260ms cubic-bezier(0.4, 0, 0.2, 1);
 }

@@ -1,6 +1,7 @@
 import type { LanguageDef } from "../languages";
 import {
   runJs, runTs, runPython, runLua, runSql, runRuby, runPhp, runHtml, runBrainfuck,
+  runCoffeeScript, runMarkdown,
 } from "./browser";
 import { runOnServer } from "./server";
 import type { RunResult } from "./types";
@@ -15,6 +16,8 @@ export async function runCode(lang: LanguageDef, code: string): Promise<RunResul
     case "ruby": return runRuby(code);
     case "php": return runPhp(code);
     case "html": return runHtml(code);
+    case "markdown": return runMarkdown(code);
+    case "coffeescript": return runCoffeeScript(code);
     case "brainfuck": return runBrainfuck(code);
     case "server": return runOnServer(lang.id, lang.serverId, code);
     default: return runOnServer(lang.id, lang.serverId, code);

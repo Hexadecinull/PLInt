@@ -8,7 +8,7 @@ import { LanguageSidebar } from "@/components/LanguageSidebar";
 import { OutputPane } from "@/components/OutputPane";
 import { SyntaxGuide } from "@/components/SyntaxGuide";
 import { Toolbar } from "@/components/Toolbar";
-import { applyAccent, applyDensity, applyMotion, applyTheme, getSettings } from "@/lib/settings";
+import { applyAccent, applyDensity, applyMotion, applyTheme, getSettings, useSettings } from "@/lib/settings";
 import type { SavedFile } from "@/lib/files";
 import { useSecretState, enabledLanguages } from "@/lib/secret";
 
@@ -26,12 +26,12 @@ export const Route = createFileRoute("/app")({
       {
         name: "description",
         content:
-          "The PLInt workspace: run and edit code in 60+ programming languages, with saved files, live errors and full syntax highlighting.",
+          "The PLInt workspace: run and edit code in 125+ programming languages, with saved files, live errors and full syntax highlighting.",
       },
       { property: "og:title", content: "PLInt — Workspace" },
       {
         property: "og:description",
-        content: "Run 60+ programming languages online — instantly, in one tab.",
+        content: "Run 125+ programming languages online — instantly, in one tab.",
       },
     ],
   }),
@@ -48,13 +48,14 @@ interface PersistedState {
 }
 
 function loadState(): PersistedState {
-  if (typeof window === "undefined") return { active: "python", buffers: {} };
+  const fallback = typeof window === "undefined" ? "python" : getSettings().defaultLanguage;
+  if (typeof window === "undefined") return { active: fallback, buffers: {} };
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { active: "python", buffers: {} };
+    if (!raw) return { active: fallback, buffers: {} };
     return JSON.parse(raw);
   } catch {
-    return { active: "python", buffers: {} };
+    return { active: fallback, buffers: {} };
   }
 }
 
@@ -72,6 +73,7 @@ function PLInt() {
   const [settingsEverOpened, setSettingsEverOpened] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [secret] = useSecretState();
+  const [settings] = useSettings();
   const sidebarPanelRef = usePanelRef();
 
   useEffect(() => { if (filesOpen) setFilesEverOpened(true); }, [filesOpen]);
@@ -79,7 +81,7 @@ function PLInt() {
 
   useEffect(() => {
     const s = loadState();
-    setActive(s.active in LANG_BY_ID ? s.active : "python");
+    setActive(s.active in LANG_BY_ID ? s.active : getSettings().defaultLanguage);
     setBuffers(s.buffers ?? {});
     setCurrentFileByLang(s.currentFileByLang ?? {});
     setSidebarCollapsed(Boolean(s.sidebarCollapsed));
@@ -92,17 +94,21 @@ function PLInt() {
   }, []);
 
   // Drive the collapsible sidebar panel via imperative ref so its
-  // last-expanded size is preserved across toggles. Toggle a brief
-  // `sidebarAnimating` flag so a CSS transition on flex plays without
-  // interfering with drag-resize the rest of the time.
-  const [sidebarAnimating, setSidebarAnimating] = useState(false);
+  // last-expanded size is preserved across toggles. react-resizable-panels
+  // applies `className`/`style` to a nested wrapper div, not the actual
+  // flex-sized root element, so a CSS transition on flex has to be toggled
+  // directly on the root via `elementRef` instead — otherwise it never
+  // animates. The class is only added for a brief window so drag-resize
+  // stays instant the rest of the time.
+  const sidebarElRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const p = sidebarPanelRef.current;
+    const el = sidebarElRef.current;
     if (!p) return;
-    setSidebarAnimating(true);
+    el?.classList.add("sidebar-anim");
     if (sidebarCollapsed) p.collapse();
     else p.expand();
-    const t = setTimeout(() => setSidebarAnimating(false), 280);
+    const t = setTimeout(() => el?.classList.remove("sidebar-anim"), 280);
     return () => clearTimeout(t);
   }, [sidebarCollapsed, hydrated, sidebarPanelRef]);
 
@@ -154,6 +160,14 @@ function PLInt() {
 
   const runRef = useRef(run);
   runRef.current = run;
+
+  // Debounced auto-run: only active when the user opts in via workspace
+  // settings, so it doesn't surprise anyone or burn server CPU by default.
+  useEffect(() => {
+    if (!hydrated || !settings.autoRunOnChange) return;
+    const t = setTimeout(() => runRef.current(), 800);
+    return () => clearTimeout(t);
+  }, [code, settings.autoRunOnChange, hydrated]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -214,16 +228,14 @@ function PLInt() {
           <Group orientation="horizontal" className="flex min-h-0 flex-1">
             <Panel
               panelRef={sidebarPanelRef}
+              elementRef={sidebarElRef}
               id="sidebar"
               defaultSize="18%"
               minSize="200px"
               maxSize="34%"
               collapsible
               collapsedSize={0}
-              className={
-                "min-h-0 overflow-hidden " +
-                (sidebarAnimating ? "sidebar-anim" : "")
-              }
+              className="min-h-0 overflow-hidden"
             >
 
               <div

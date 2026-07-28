@@ -1,5 +1,6 @@
 // Register Monarch tokenizers for languages Monaco doesn't ship out of the box:
-// Haxe, Zig, Nim, Nix, Brainfuck, LOLCODE, Shakespeare, Malbolge, Smali, Svelte.
+// Haxe, Zig, Nim, Nix, Brainfuck, LOLCODE, Shakespeare, Malbolge, Smali, Svelte,
+// ActionScript, MATLAB, Ada, Smalltalk, Groovy.
 // Registration is idempotent — called from EditorPane's beforeMount hook.
 
 type Monaco = typeof import("monaco-editor");
@@ -364,6 +365,149 @@ export function registerCustomLanguages(monaco: Monaco) {
           [/"([^"\\]|\\.)*"/, "string"],
           [/\b(?:let|be|put|into|is|was|were|says|shout|say|whisper|scream|if|else|while|until|take|top|of|and|or|not|nothing|null|nowhere|true|false|yes|no|mysterious|listen|to|give|back|return|build|up|knock|down|break|it|continue)\b/, "keyword"],
           [/\b\d+(?:\.\d+)?\b/, "number"],
+        ],
+      },
+    });
+  }
+
+  if (!has("actionscript")) {
+    monaco.languages.register({ id: "actionscript" });
+    monaco.languages.setMonarchTokensProvider("actionscript", {
+      defaultToken: "",
+      keywords: [
+        "as","break","case","catch","class","const","continue","default","delete","do","dynamic",
+        "each","else","extends","false","final","finally","for","function","get","if","implements",
+        "import","in","include","instanceof","interface","internal","is","native","new","null",
+        "override","package","private","protected","public","return","set","static","super","switch",
+        "this","throw","to","true","try","typeof","use","var","void","while","with",
+      ],
+      tokenizer: {
+        root: [
+          [/\/\/.*$/, "comment"],
+          [/\/\*/, "comment", "@comment"],
+          [/"([^"\\]|\\.)*"/, "string"],
+          [/'([^'\\]|\\.)*'/, "string"],
+          [/\b\d+(\.\d+)?\b/, "number"],
+          [/[A-Z][\w.]*/, "type"],
+          [/[a-zA-Z_$][\w$]*/, { cases: { "@keywords": "keyword", "@default": "identifier" } }],
+          [/[{}()\[\]]/, "@brackets"],
+          [/[<>=!+\-*/%&|^~?:.]+/, "operator"],
+        ],
+        comment: [
+          [/[^*/]+/, "comment"],
+          [/\*\//, "comment", "@pop"],
+          [/./, "comment"],
+        ],
+      },
+    });
+  }
+
+  if (!has("matlab")) {
+    monaco.languages.register({ id: "matlab" });
+    monaco.languages.setMonarchTokensProvider("matlab", {
+      defaultToken: "",
+      keywords: [
+        "function","end","if","elseif","else","for","while","switch","case","otherwise","break",
+        "continue","return","global","persistent","try","catch","classdef","properties","methods",
+        "true","false","nargin","nargout",
+      ],
+      tokenizer: {
+        root: [
+          [/%.*$/, "comment"],
+          [/'([^'\\]|\\.)*'/, "string"],
+          [/"([^"\\]|\\.)*"/, "string"],
+          [/\b\d+(\.\d+)?([eE][+-]?\d+)?[ij]?\b/, "number"],
+          [/[a-zA-Z_]\w*/, { cases: { "@keywords": "keyword", "@default": "identifier" } }],
+          [/[{}()\[\]]/, "@brackets"],
+          [/[<>=!+\-*/\\^~?:.,;]+/, "operator"],
+        ],
+      },
+    });
+  }
+
+  if (!has("ada")) {
+    monaco.languages.register({ id: "ada" });
+    monaco.languages.setMonarchTokensProvider("ada", {
+      defaultToken: "",
+      ignoreCase: true,
+      keywords: [
+        "abort","abs","abstract","accept","access","aliased","all","and","array","at","begin","body",
+        "case","constant","declare","delay","delta","digits","do","else","elsif","end","entry",
+        "exception","exit","for","function","generic","goto","if","in","interface","is","limited",
+        "loop","mod","new","not","null","of","or","others","out","overriding","package","pragma",
+        "private","procedure","protected","raise","range","record","rem","renames","requeue","return",
+        "reverse","select","separate","some","subtype","synchronized","tagged","task","terminate",
+        "then","type","until","use","when","while","with","xor",
+      ],
+      tokenizer: {
+        root: [
+          [/--.*$/, "comment"],
+          [/"([^"\\]|\\.)*"/, "string"],
+          [/\b\d+(_\d+)*(\.\d+(_\d+)*)?(#[0-9a-fA-F_]+#)?\b/, "number"],
+          [/[a-zA-Z_]\w*/, { cases: { "@keywords": "keyword", "@default": "identifier" } }],
+          [/[{}()\[\]]/, "@brackets"],
+          [/:=|=>|[<>=!+\-*/&.,;:]+/, "operator"],
+        ],
+      },
+    });
+  }
+
+  if (!has("smalltalk")) {
+    monaco.languages.register({ id: "smalltalk" });
+    monaco.languages.setMonarchTokensProvider("smalltalk", {
+      defaultToken: "",
+      tokenizer: {
+        root: [
+          [/"([^"]|"")*"/, "comment"],
+          [/'([^']|'')*'/, "string"],
+          [/#[a-zA-Z_][\w:]*/, "constant"],
+          [/\$./, "string"],
+          [/\b\d+(\.\d+)?\b/, "number"],
+          [/\b(?:nil|true|false|self|super|thisContext)\b/, "keyword"],
+          [/[a-zA-Z_][\w]*:/, "type"],
+          [/[a-zA-Z_][\w]*/, "identifier"],
+          [/[\[\]{}()]/, "@brackets"],
+          [/[<>=!+\-*/~@%|&,^]+/, "operator"],
+        ],
+      },
+    });
+  }
+
+  if (!has("groovy")) {
+    monaco.languages.register({ id: "groovy" });
+    monaco.languages.setMonarchTokensProvider("groovy", {
+      defaultToken: "",
+      keywords: [
+        "abstract","as","assert","boolean","break","byte","case","catch","char","class","continue",
+        "def","default","do","double","else","enum","extends","false","final","finally","float","for",
+        "if","implements","import","in","instanceof","int","interface","long","native","new","null",
+        "package","private","protected","public","return","short","static","strictfp","super","switch",
+        "synchronized","this","throw","throws","trait","transient","true","try","void","volatile","while",
+      ],
+      tokenizer: {
+        root: [
+          [/\/\/.*$/, "comment"],
+          [/\/\*/, "comment", "@comment"],
+          [/"""/, "string", "@gstring"],
+          [/"([^"\\]|\\.)*"/, "string"],
+          [/'([^'\\]|\\.)*'/, "string"],
+          [/\b\d+(\.\d+)?\b/, "number"],
+          [/@[A-Z]\w*/, "annotation"],
+          [/[A-Z]\w*/, "type"],
+          [/[a-zA-Z_$][\w$]*/, { cases: { "@keywords": "keyword", "@default": "identifier" } }],
+          [/[{}()\[\]]/, "@brackets"],
+          [/[<>=!+\-*/%&|^~?:.]+/, "operator"],
+        ],
+        comment: [
+          [/[^*/]+/, "comment"],
+          [/\*\//, "comment", "@pop"],
+          [/./, "comment"],
+        ],
+        gstring: [
+          [/[^"$]+/, "string"],
+          [/"""/, "string", "@pop"],
+          [/\$\{[^}]*\}/, "variable"],
+          [/./, "string"],
         ],
       },
     });
