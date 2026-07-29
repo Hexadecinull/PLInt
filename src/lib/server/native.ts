@@ -1,13 +1,9 @@
 // Dispatches "server" runtime languages to real, installed system
-// interpreters/compilers. Each entry only needs a `run` (and optional
-// `build`) step — see docs/ARCHITECTURE.md for the full list and
-// scripts/install-interpreters.sh for what to apt-install.
+// interpreters/compilers. See docs/ARCHITECTURE.md and
+// scripts/install-interpreters.sh.
 //
 // Nothing here is bundled or auto-installed: if a binary isn't on PATH,
-// the response says exactly what to install instead of failing silently.
-// That's a deliberate resource trade-off for a small personal server —
-// installing every possible compiler by default would be a lot of disk
-// and RAM for languages a given user may never touch.
+// the response says what to install instead of failing silently.
 
 import { hasBinary, run, withWorkspace, type ExecOutcome } from "./sandbox";
 
@@ -41,9 +37,9 @@ const GRACEFUL: Record<string, string> = {
     "src/lib/server/native.ts.",
   batch:
     "Windows Batch has no native Linux runtime. Running it here would mean installing Wine just for " +
-    ".bat files — install Wine and add a runner in src/lib/server/native.ts if you need this.",
+    ".bat files - install Wine and add a runner in src/lib/server/native.ts if you need this.",
   elm:
-    "Elm targets the browser (DOM/ports), not headless stdout — there's no meaningful 'print and exit' " +
+    "Elm targets the browser (DOM/ports), not headless stdout - there's no meaningful 'print and exit' " +
     "story for it. Use `elm reactor` locally to run Elm programs interactively.",
   mojo:
     "Mojo's toolchain (via the Modular CLI) is a multi-GB install, which is a lot for a small personal " +
@@ -54,12 +50,12 @@ const GRACEFUL: Record<string, string> = {
     "small server. Install gnustep-base-runtime + gobjc if you want this enabled, then add a runner in " +
     "src/lib/server/native.ts.",
   objcpp:
-    "Objective-C++ has the same GNUstep dependency as Objective-C — see that message.",
+    "Objective-C++ has the same GNUstep dependency as Objective-C - see that message.",
   smali:
     "Smali/Dalvik execution needs Android build tooling (dx/d8 + an ART or Dalvik runtime), which is " +
     "too heavy for a general-purpose personal server. Not enabled by default.",
   svelte:
-    "Svelte components compile to DOM-mutation code — they need a browser (or jsdom) to actually run, " +
+    "Svelte components compile to DOM-mutation code - they need a browser (or jsdom) to actually run, " +
     "not a plain Node process. Not a good fit for headless 'run and print stdout'.",
 };
 

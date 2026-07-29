@@ -1,7 +1,7 @@
 export interface RunResult {
   stdout: string;
   stderr: string;
-  /** Diagnostics from compilers/linters — errors and warnings. */
+  /** Diagnostics from compilers/linters - errors and warnings. */
   diagnostics: Diagnostic[];
   /** Milliseconds to execute. */
   durationMs: number;

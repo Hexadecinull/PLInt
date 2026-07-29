@@ -1,10 +1,6 @@
-// Esoteric-language interpreters. These run entirely in-process (no
-// subprocess, no install) so they're free performance-wise — a good fit
-// for a resource-limited box. Several of these languages don't have one
-// canonical reference implementation; where the spec is genuinely
-// ambiguous (Shakespeare's poetic values, INTERCAL's numeral tricks,
-// Chicken's instruction mapping) this sticks to a documented, internally
-// consistent subset rather than guessing at edge cases. See docs/USAGE.md.
+// Esoteric-language interpreters. Run in-process, no subprocess or install
+// needed. A few languages (Shakespeare, INTERCAL, Chicken) don't have one
+// canonical spec, so these use a documented subset. See docs/USAGE.md.
 
 export interface EsoResult {
   stdout: string;
@@ -244,7 +240,7 @@ export function runBefunge(src: string, stdin = ""): EsoResult {
     y = (y + dy + H) % H;
     if (c === "@") { halted = true; break; }
   }
-  if (!halted) return fail("Step limit exceeded (possible infinite loop — no @ reached).", out);
+  if (!halted) return fail("Step limit exceeded (possible infinite loop - no @ reached).", out);
   return ok(out);
 }
 
@@ -258,7 +254,7 @@ export function runBinary(src: string): EsoResult {
   return ok(out);
 }
 
-// -------------------- Chicken (best-effort — see docs/USAGE.md) --------------------
+// -------------------- Chicken (best-effort - see docs/USAGE.md) --------------------
 export function runChicken(src: string): EsoResult {
   const lines = src.split("\n").map((l) => (l.match(/chicken/gi) ?? []).length).filter((n) => n > 0);
   const stack: number[] = [];
@@ -297,7 +293,7 @@ export function runArnoldC(src: string): EsoResult {
       continue;
     }
   }
-  if (!started) return fail("Missing \"IT'S SHOWTIME\" — every ArnoldC program needs one.");
+  if (!started) return fail("Missing \"IT'S SHOWTIME\" - every ArnoldC program needs one.");
   return ok(out);
 }
 
@@ -507,7 +503,7 @@ export function runLolcode(src: string): EsoResult {
   return ok(out);
 }
 
-// -------------------- Shakespeare (best-effort — see docs/USAGE.md) --------------------
+// -------------------- Shakespeare (best-effort - see docs/USAGE.md) --------------------
 export function runShakespeare(src: string): EsoResult {
   const lines = src.split("\n");
   const characters = new Set<string>();
@@ -562,10 +558,10 @@ export function runShakespeare(src: string): EsoResult {
       if (/^Open your mind/i.test(s)) { out += String(values.get(other) ?? 0); continue; }
     }
   }
-  return ok(out || "(no output — see docs/USAGE.md for the supported Shakespeare subset)\n");
+  return ok(out || "(no output - see docs/USAGE.md for the supported Shakespeare subset)\n");
 }
 
-// -------------------- INTERCAL (best-effort subset — see docs/USAGE.md) --------------------
+// -------------------- INTERCAL (best-effort subset - see docs/USAGE.md) --------------------
 export function runIntercal(src: string): EsoResult {
   const arrays = new Map<string, number[]>();
   let out = "";
@@ -586,12 +582,12 @@ export function runIntercal(src: string): EsoResult {
   return ok(out);
 }
 
-// -------------------- Chef (core subset — see docs/USAGE.md) --------------------
+// -------------------- Chef (core subset - see docs/USAGE.md) --------------------
 export function runChef(src: string): EsoResult {
   const lines = src.split("\n");
   const ingredients = new Map<string, number>();
   const liquefied = new Set<string>();
-  let bowl: { name: string; value: number }[] = [];
+  const bowl: { name: string; value: number }[] = [];
   let dish: { name: string; value: number }[] = [];
   let servesN = 1;
   let inIngredients = false, inMethod = false;
@@ -632,17 +628,17 @@ export function runChef(src: string): EsoResult {
   return ok(out);
 }
 
-// -------------------- Piet / Malbolge — not executable here --------------------
+// -------------------- Piet / Malbolge - not executable here --------------------
 export function pietMessage(): EsoResult {
   return fail(
-    "Piet programs are 2D images (colored codels), not text — PLInt can't execute image source. " +
+    "Piet programs are 2D images (colored codels), not text - PLInt can't execute image source. " +
       "Use a dedicated Piet interpreter (e.g. npiet) locally with your PNG."
   );
 }
 
 export function malbolgeMessage(variant: "malbolge" | "malbolge-u"): EsoResult {
   return fail(
-    `${variant === "malbolge" ? "Malbolge" : "Malbolge Unshackled"} isn't executed in-app — its ` +
+    `${variant === "malbolge" ? "Malbolge" : "Malbolge Unshackled"} isn't executed in-app - its ` +
       "encryption/rotation tables are too easy to get subtly wrong without a reference implementation " +
       "to check against, and a wrong answer here would be worse than none. Install a dedicated " +
       `${variant === "malbolge" ? "malbolge" : "malbolge-unshackled"} interpreter on the server and PLInt ` +

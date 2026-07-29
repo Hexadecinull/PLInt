@@ -1,13 +1,13 @@
 # Usage Guide
 
-This covers how to actually use PLInt once it's running — either your own
+This covers how to actually use PLInt once it's running - either your own
 deployment or a local dev server.
 
 ## The basics
 
 Pick a language from the sidebar, write code in the editor, and press
-**Ctrl+Enter** (or the Run button) to execute it. Output — stdout, stderr,
-and any compiler diagnostics — shows up in the terminal pane on the right.
+**Ctrl+Enter** (or the Run button) to execute it. Output - stdout, stderr,
+and any compiler diagnostics - shows up in the terminal pane on the right.
 
 Languages fall into two execution categories, though this is mostly
 invisible day to day:
@@ -25,7 +25,7 @@ invisible day to day:
 The file icon in the toolbar opens the file manager, where you can save the
 current buffer, rename or delete saved files, download a file to disk, or
 import a previously exported `.json` bundle. Files are stored in your
-browser's local storage — they aren't synced anywhere, and clearing your
+browser's local storage - they aren't synced anywhere, and clearing your
 browser data will remove them. Export regularly if you want a backup.
 
 Deleting a file asks for confirmation by default; this can be turned off in
@@ -33,7 +33,7 @@ Deleting a file asks for confirmation by default; this can be turned off in
 
 ## The secret menu
 
-Not every language shows up in the sidebar by default — the full set of
+Not every language shows up in the sidebar by default - the full set of
 150+ languages would be a lot to page through for a first-time visitor.
 Head to **Settings → Secret Menu** to toggle on the "weird," esoteric, and
 assembly-language groups individually.
@@ -42,8 +42,7 @@ assembly-language groups individually.
 
 At the bottom of the Assembly section is a **"Don't see your Assembly?
 Submit it now!"** button. It asks for the name of the variant you'd like
-supported, checks it against what's already available, and — if it's new —
-records it for the person running this instance to review. You'll get a
+supported, checks it against what's already available, and - if it's new - records it for the person running this instance to review. You'll get a
 confirmation either way. These submissions aren't visible anywhere in the
 app; they're written to a text file the server operator can read from their
 own terminal (see [DEPLOY.md](DEPLOY.md)).
@@ -58,11 +57,11 @@ rendering, smooth scrolling, format-on-paste, line-highlight style, an
 confirmations, auto-run after you stop typing, terminal font size, and
 which language loads by default.
 
-**Appearance** settings cover theme (light/dark), accent color — including
+**Appearance** settings cover theme (light/dark), accent color - including
 a full custom color picker (drag the saturation/value square, or type a
-hex code directly) — density, and motion/animation preferences.
+hex code directly) - density, and motion/animation preferences.
 
-## Esoteric and assembly languages — what to expect
+## Esoteric and assembly languages - what to expect
 
 A handful of the esoteric languages (Whitespace, Befunge, LOLCODE, Chef,
 ArnoldC, Rockstar, Deadfish, Ook!, Binary) have complete, tested
@@ -82,7 +81,7 @@ otherwise:
 - **Chicken**: this language's own spec is famously disputed/joke-like;
   PLInt uses a simple, internally-consistent instruction mapping based on
   "chicken" word counts per line.
-- **Piet**: source is a 2D image, not text, so PLInt can't execute it —
+- **Piet**: source is a 2D image, not text, so PLInt can't execute it,
   you'll get an explanatory message instead. Use a dedicated tool like
   `npiet` locally.
 - **Malbolge / Malbolge Unshackled**: deliberately not executed in-app.
@@ -93,7 +92,7 @@ otherwise:
 
 Every other assembly-language entry (x86, ARM, RISC-V, the Apollo Guidance
 Computer, and everything in between) runs on one shared, pedagogical
-assembly simulator rather than a real per-architecture toolchain — see
+assembly simulator rather than a real per-architecture toolchain - see
 [ARCHITECTURE.md](ARCHITECTURE.md) for why that's the more honest and more
 resource-friendly choice for a hobby personal server.
 

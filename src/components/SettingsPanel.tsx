@@ -162,14 +162,14 @@ export function SettingsPanel({ open, onClose }: Props) {
                 </Section>
 
                 <Section title="Editor">
-                  <Row label={`Font size — ${settings.fontSize}px`}>
+                  <Row label={`Font size - ${settings.fontSize}px`}>
                     <input
                       type="range" min={10} max={22} value={settings.fontSize}
                       onChange={(e) => update({ fontSize: Number(e.target.value) })}
                       className="w-full accent-primary"
                     />
                   </Row>
-                  <Row label={`Tab size — ${settings.tabSize}`}>
+                  <Row label={`Tab size - ${settings.tabSize}`}>
                     <input
                       type="range" min={2} max={8} step={2} value={settings.tabSize}
                       onChange={(e) => update({ tabSize: Number(e.target.value) })}
@@ -227,7 +227,7 @@ export function SettingsPanel({ open, onClose }: Props) {
                   <Toggle label="Auto-save buffers" checked={settings.autoSave} onChange={(v) => update({ autoSave: v })} />
                   <Toggle label="Confirm before deleting files" checked={settings.confirmBeforeDelete} onChange={(v) => update({ confirmBeforeDelete: v })} />
                   <Toggle label="Auto-run after you stop typing" checked={settings.autoRunOnChange} onChange={(v) => update({ autoRunOnChange: v })} />
-                  <Row label={`Terminal font size — ${settings.terminalFontSize}px`}>
+                  <Row label={`Terminal font size - ${settings.terminalFontSize}px`}>
                     <input
                       type="range" min={10} max={20} value={settings.terminalFontSize}
                       onChange={(e) => update({ terminalFontSize: Number(e.target.value) })}
@@ -310,7 +310,7 @@ function SecretMenu({ enabled, onBack }: { enabled: string[]; onBack: () => void
       <div className="mb-4 flex items-center justify-between">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-primary">
-            — Secret Menu
+            - Secret Menu
           </div>
           <p className="mt-1 font-mono text-[11px] text-muted-foreground">
             Enable weird & esoteric interpreters. You've been warned.
@@ -355,11 +355,9 @@ function SecretGroup({
   );
 }
 
-// "Don't see your Assembly? Submit it now!" — spans the width of two
-// toggle buttons and walks through: prompt for a name, POST it to the
-// server, then tell the person whether it was new or already on file.
-// The submissions themselves are only readable from the server's own
-// terminal (see docs/DEPLOY.md) — nothing reads them back over HTTP.
+// Prompts for a name, POSTs it, then reports whether it was new or
+// already on file. Submissions are only readable from the server
+// terminal, see docs/DEPLOY.md.
 function SubmitAssemblyRow() {
   const dialogs = useDialogs();
   const [busy, setBusy] = useState(false);
@@ -382,7 +380,7 @@ function SubmitAssemblyRow() {
       });
       const data = await res.json().catch(() => ({ status: "error" as const }));
       if (data.status === "duplicate") {
-        await dialogs.alert(`"${trimmed}" is already on the list — thanks anyway!`, {
+        await dialogs.alert(`"${trimmed}" is already on the list - thanks anyway!`, {
           title: "already submitted",
         });
       } else if (data.status === "ok") {
@@ -451,7 +449,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <div className="mb-5">
       <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-        — {title}
+        - {title}
       </div>
       <div className="space-y-3">{children}</div>
     </div>
@@ -536,7 +534,7 @@ function AboutView({ onBack }: { onBack: () => void }) {
     <div className="animate-fade-in font-mono text-[12px] leading-relaxed">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <div className="text-[10px] uppercase tracking-widest text-primary">— About PLInt</div>
+          <div className="text-[10px] uppercase tracking-widest text-primary">- About PLInt</div>
         </div>
         <button
           onClick={onBack}
@@ -554,7 +552,7 @@ function AboutView({ onBack }: { onBack: () => void }) {
           <div>
             <div className="text-[15px] font-semibold text-foreground">PLInt</div>
             <div className="text-[11px] text-muted-foreground">
-              Programming Language Interpreter Hub — v0.4
+              Programming Language Interpreter Hub - v0.4
             </div>
           </div>
         </div>

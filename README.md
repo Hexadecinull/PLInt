@@ -1,7 +1,7 @@
-# PLInt — Programming Language Interpreter Hub
+# PLInt - Programming Language Interpreter Hub
 
 PLInt is a browser-based playground for writing and running code in a very
-large number of programming languages — from the everyday (Python,
+large number of programming languages - from the everyday (Python,
 JavaScript, Go, Rust) to the obscure (Whitespace, Shakespeare, INTERCAL) to
 dozens of assembly-language variants, real and historical.
 
@@ -13,7 +13,7 @@ management, and a server-side execution backend you run yourself.
 - **150+ languages** across mainstream, "weird," esoteric, and assembly
   categories, with real syntax highlighting via Monaco (the VS Code editor).
 - **In-browser execution** for JavaScript, TypeScript, Python, Lua, SQL,
-  Ruby, PHP, Brainfuck, CoffeeScript, HTML, and Markdown — no server round
+  Ruby, PHP, Brainfuck, CoffeeScript, HTML, and Markdown - no server round
   trip needed.
 - **Server-side execution** for everything else, dispatched to real system
   interpreters/compilers where available, a shared assembly simulator for
@@ -37,7 +37,7 @@ npm run dev
 This starts the app in development mode. Code you write for browser-executed
 languages (JS, Python, etc.) runs immediately, no setup required. Everything
 else needs the server-side execution backend, which works out of the box in
-`npm run dev` too — it just calls out to whatever interpreters are already
+`npm run dev` too - it just calls out to whatever interpreters are already
 installed on your machine, and tells you what's missing otherwise.
 
 ## Deploying your own instance
@@ -48,18 +48,7 @@ proxy), including auto-updates via GitHub webhooks.
 
 ## Documentation
 
-All further documentation lives in [`docs/`](docs/):
-
-| Document | What it covers |
-|---|---|
-| [USAGE.md](docs/USAGE.md) | Using the app: languages, files, the secret menu, settings |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | How the app and its execution backend are put together |
-| [DEPLOY.md](docs/DEPLOY.md) | Self-hosting: Node, PM2, reverse proxies, auto-updates |
-| [CONTRIBUTING.md](docs/CONTRIBUTING.md) | How to propose changes, coding style, PR process |
-| [CODE_OF_CONDUCT.md](docs/CODE_OF_CONDUCT.md) | Community expectations |
-| [SECURITY.md](docs/SECURITY.md) | Reporting vulnerabilities, the execution-sandboxing model |
-| [PRIVACY.md](docs/PRIVACY.md) | What data this app collects and stores (short version: very little) |
-| [TERMS.md](docs/TERMS.md) | Terms of service for instances you operate |
+See [docs/README.md](docs/README.md) for the full documentation index.
 
 ## Tech stack
 
@@ -69,11 +58,11 @@ All further documentation lives in [`docs/`](docs/):
   editor
 - [Tailwind CSS](https://tailwindcss.com) v4 for styling
 - Plain Node.js (via [Nitro](https://nitro.build)'s `node-server` preset)
-  for the production server — no Docker, no cloud lock-in
+  for the production server - no Docker, no cloud lock-in
 
 ## License
 
-AGPL-3.0 — see [LICENSE](LICENSE).
+AGPL-3.0 - see [LICENSE](LICENSE).
 
 ## Origins
 

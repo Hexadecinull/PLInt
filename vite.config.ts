@@ -10,7 +10,7 @@ import viteTsConfigPaths from "vite-tsconfig-paths";
 // build target to Cloudflare Workers. PLInt is meant to run as a plain
 // Node process behind PM2, so the preset below is explicitly "node-server".
 //
-// Build output lands in `.output/server/index.mjs` — that's the entry
+// Build output lands in `.output/server/index.mjs` - that's the entry
 // point PM2 runs in production (see ecosystem.config.cjs).
 export default defineConfig({
   plugins: [

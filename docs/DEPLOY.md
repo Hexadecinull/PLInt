@@ -2,17 +2,17 @@
 
 This walks through running your own PLInt instance on a Linux server you
 control. It's written for anyone deploying PLInt, not just the original
-author — adjust paths, domains, and service names to fit your setup.
+author - adjust paths, domains, and service names to fit your setup.
 
 ## Prerequisites
 
 - A Linux server (Debian/Ubuntu commands are used below; adjust for your
   distro) with SSH access.
-- **Node.js 20 or newer**. Check with `node -v`.
+- **Node.js 22.12 or newer** (TanStack Start requires it). Check with `node -v`.
 - **PM2** for process management: `npm install -g pm2`.
 - **Git**, for cloning the repo and pulling updates.
 - A domain name pointed at your server, if you want it reachable from the
-  internet (optional — PLInt works fine on `localhost` too).
+  internet (optional - PLInt works fine on `localhost` too).
 
 ## 1. Get the code
 
@@ -30,9 +30,9 @@ cp .env.example .env
 
 Edit `.env`:
 
-- `PORT` / `HOST` — where the app listens. `127.0.0.1` is a sensible
+- `PORT` / `HOST` - where the app listens. `127.0.0.1` is a sensible
   default if you're putting a reverse proxy in front of it (see step 5).
-- `GITHUB_WEBHOOK_SECRET` — only needed if you want auto-updates (step 6).
+- `GITHUB_WEBHOOK_SECRET` - only needed if you want auto-updates (step 6).
   Generate one with `openssl rand -hex 32`.
 
 ## 3. Build
@@ -107,7 +107,7 @@ Then get a certificate with `certbot`.
 ### Option C: Cloudflare Tunnel (no open inbound ports at all)
 
 If your domain's DNS is on Cloudflare, a Tunnel avoids opening any inbound
-port on your server or router entirely — useful behind CGNAT or a
+port on your server or router entirely - useful behind CGNAT or a
 restrictive firewall.
 
 ```bash
@@ -149,7 +149,7 @@ pm2 save
 ```
 
 It listens on `127.0.0.1:9000/webhook` by default (see `WEBHOOK_PORT` in
-`.env`). Expose that path publicly through your reverse proxy — for
+`.env`). Expose that path publicly through your reverse proxy - for
 example, with Caddy:
 
 ```
@@ -169,13 +169,13 @@ Then, in your GitHub repo: **Settings → Webhooks → Add webhook**
 - **Secret**: the same value as `GITHUB_WEBHOOK_SECRET` in `.env`
 - **Which events**: "Just the push event"
 
-Push to your deploy branch (`main` by default — change with `DEPLOY_BRANCH`
+Push to your deploy branch (`main` by default - change with `DEPLOY_BRANCH`
 in `.env`) and check `logs/deploy.log` to confirm it ran.
 
 ## 7. Install language interpreters as you need them
 
 Every server-executed language works out of the box in the sense that it
-tells you exactly what's missing if its interpreter isn't installed — the
+tells you exactly what's missing if its interpreter isn't installed - the
 app never needs a restart to pick up a newly-installed one. See
 `scripts/install-interpreters.sh` for an apt-based installer, split into a
 light default tier and a heavier opt-in tier:
@@ -196,13 +196,13 @@ bash scripts/deploy/update.sh
 
 ## Troubleshooting
 
-- **`pm2 logs plint` shows a port-in-use error** — something else is
+- **`pm2 logs plint` shows a port-in-use error** - something else is
   already bound to `PORT`. Change it in `.env` and restart:
   `pm2 restart plint --update-env`.
-- **A language always says "not found"** — its interpreter isn't
+- **A language always says "not found"** - its interpreter isn't
   installed, or isn't on the `PATH` that PM2's process sees. Confirm with
   `which <the-binary>` as the same user PM2 runs as.
-- **The webhook returns 401** — the secret in `.env` doesn't match what
+- **The webhook returns 401** - the secret in `.env` doesn't match what
   you entered in GitHub's webhook settings.
-- **Build fails after a `git pull`** — check `npm ls nitro` against the
+- **Build fails after a `git pull`** - check `npm ls nitro` against the
   version pinned in `package.json`; see the Nitro note in step 3.

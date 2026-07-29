@@ -6,13 +6,13 @@ import { ALL_LANGUAGES, LANGUAGES } from "@/lib/languages";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PLInt — Online Programming Language Interpreter Hub" },
+      { title: "PLInt - Online Programming Language Interpreter Hub" },
       {
         name: "description",
         content:
-          "Run 125+ programming languages online — Python, JavaScript, TypeScript, Java, C#, F#, Rust, Go, Ruby, Swift, Julia, Elixir, Nim, HTML, Scala, Clojure, Erlang, Assembly and more. No accounts, no installs. Open source (AGPL-3.0).",
+          "Run 125+ programming languages online - Python, JavaScript, TypeScript, Java, C#, F#, Rust, Go, Ruby, Swift, Julia, Elixir, Nim, HTML, Scala, Clojure, Erlang, Assembly and more. No accounts, no installs. Open source (AGPL-3.0).",
       },
-      { property: "og:title", content: "PLInt — Online Interpreter Hub" },
+      { property: "og:title", content: "PLInt - Online Interpreter Hub" },
       {
         property: "og:description",
         content:
@@ -107,7 +107,7 @@ function Welcome() {
 
         <p className="mt-5 max-w-2xl text-balance font-mono text-sm leading-relaxed text-muted-foreground sm:text-base">
           PLInt is a fully online interpreter hub for {LANGUAGES.length}+ programming
-          languages — from Python and TypeScript to Rust, Haskell, Julia and Nix.
+          languages - from Python and TypeScript to Rust, Haskell, Julia and Nix.
           Full syntax highlighting, live errors, saved files. No accounts. No installs.
         </p>
 
@@ -130,7 +130,7 @@ function Welcome() {
 
         <div id="languages" className="mt-16 w-full max-w-4xl">
           <div className="mb-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            — Supported languages
+            - Supported languages
           </div>
           <div className="flex flex-wrap justify-center gap-1.5">
             {LANGUAGES.map((l) => (

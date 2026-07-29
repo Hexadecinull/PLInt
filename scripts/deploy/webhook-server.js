@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-// Minimal GitHub webhook receiver for auto-deploy. No dependencies —
-// just Node's built-in http/crypto — so it's cheap to run permanently
-// under PM2 alongside the main app. See docs/DEPLOY.md.
+// Minimal GitHub webhook receiver for auto-deploy. No dependencies, so
+// it's cheap to run permanently under PM2. See docs/DEPLOY.md.
 "use strict";
 
 const http = require("node:http");
@@ -19,7 +18,7 @@ const UPDATE_SCRIPT = path.join(REPO_ROOT, "scripts", "deploy", "update.sh");
 if (!SECRET || SECRET === "change-me") {
   console.error(
     "GITHUB_WEBHOOK_SECRET is not set (or still the placeholder). " +
-      "Set a real secret in .env before exposing this endpoint — see docs/DEPLOY.md."
+      "Set a real secret in .env before exposing this endpoint - see docs/DEPLOY.md."
   );
 }
 

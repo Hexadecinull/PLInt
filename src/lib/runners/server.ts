@@ -1,14 +1,9 @@
-// Server-backed runner. The client POSTs to a configurable endpoint that
-// the operator wires up on their own infrastructure. This keeps PLInt fully
-// online but lets languages that require compilers/interpreters (Java, C#,
-// Kotlin, Go, Dart, C, C++, Bash, PowerShell, Batch) execute on the server.
+// Server-backed runner. POSTs to /api/execute, which dispatches to real
+// system interpreters/compilers, the assembly VM, or an esoteric-language
+// interpreter, see src/lib/server/registry.ts.
 //
-// Expected request body:
-//   { languageId: string, code: string, stdin?: string }
-// Expected response body (JSON):
-//   { stdout: string, stderr: string, ok: boolean,
-//     diagnostics?: { severity, message, line?, column?, source? }[],
-//     durationMs?: number }
+// Request body: { languageId: string, code: string, stdin?: string }
+// Response body: { stdout, stderr, ok, diagnostics?, durationMs? }
 
 import type { RunResult } from "./types";
 import { emptyResult } from "./types";

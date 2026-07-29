@@ -1,13 +1,8 @@
-// A small, dependency-free assembly simulator shared by every plain
-// "asm()" catalog entry (x86, ARM, RISC-V, MSP430, the Apollo Guidance
-// Computer, ...). None of those samples use real per-ISA syntax — they're
-// all generated from the same generic placeholder (see asmSample() in
-// languages.ts) — so one pedagogical VM covers all of them consistently,
-// without installing a different cross-compiler toolchain per
-// architecture. It is NOT a cycle-accurate emulator of any real hardware;
-// see docs/ARCHITECTURE.md and docs/USAGE.md.
+// Shared simulator for every plain "asm()" catalog entry. Not a
+// cycle-accurate emulator of real hardware, just one consistent
+// pedagogical VM. See docs/ARCHITECTURE.md and docs/USAGE.md.
 //
-// Registers: r0-r7. Supported mnemonics:
+// Registers: r0-r7. Mnemonics:
 //   mov d,s   add d,s   sub d,s   mul d,s   div d,s
 //   cmp a,b   jmp L   je/jz L   jne/jnz L   jg L   jl L
 //   push s    pop d    call L    ret

@@ -4,10 +4,9 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { ASSEMBLY } from "@/lib/languages";
 
-// Submissions are appended to a plain text file at the project root.
-// Nothing in this app reads it back over HTTP — it's meant to be read
-// from the server's own terminal (`cat assembly-submissions.txt`),
-// see docs/DEPLOY.md.
+// Appends to a plain text file at the project root. Nothing here reads
+// it back over HTTP, it's meant to be read from the server terminal.
+// See docs/DEPLOY.md.
 const FILE_PATH = path.resolve(process.cwd(), "assembly-submissions.txt");
 
 function normalize(name: string): string {

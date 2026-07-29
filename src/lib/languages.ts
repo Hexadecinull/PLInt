@@ -37,7 +37,7 @@ export interface LanguageDef {
 
 // ---------------- samples ----------------
 
-const py = `# Python 3 — PLInt
+const py = `# Python 3 - PLInt
 def greet(name: str) -> str:
     return f"Hello, {name}!"
 
@@ -45,40 +45,40 @@ for i in range(3):
     print(greet(f"world #{i}"))
 `;
 
-const rb = `# Ruby — PLInt
+const rb = `# Ruby - PLInt
 def greet(name) = "Hello, #{name}!"
 3.times { |i| puts greet("world ##{i}") }
 `;
 
 const perl = `#!/usr/bin/perl
-# Perl — PLInt
+# Perl - PLInt
 use strict; use warnings;
 sub greet { my ($n) = @_; return "Hello, $n!"; }
 for my $i (0..2) { print greet("world #$i"), "\\n"; }
 `;
 
-const lua = `-- Lua — PLInt
+const lua = `-- Lua - PLInt
 local function greet(name) return "Hello, " .. name .. "!" end
 for i = 0, 2 do print(greet("world #" .. i)) end
 `;
 
-const r = `# R — PLInt
+const r = `# R - PLInt
 greet <- function(name) paste0("Hello, ", name, "!")
 for (i in 0:2) cat(greet(paste0("world #", i)), "\\n")
 `;
 
 const php = `<?php
-// PHP — PLInt
+// PHP - PLInt
 function greet($name) { return "Hello, $name!"; }
 for ($i = 0; $i < 3; $i++) echo greet("world #$i") . "\\n";
 `;
 
-const js = `// JavaScript — PLInt
+const js = `// JavaScript - PLInt
 const greet = (name) => \`Hello, \${name}!\`;
 for (let i = 0; i < 3; i++) console.log(greet(\`world #\${i}\`));
 `;
 
-const ts = `// TypeScript — PLInt
+const ts = `// TypeScript - PLInt
 type User = { name: string; age: number };
 const users: User[] = [
   { name: "Ada", age: 36 },
@@ -87,7 +87,7 @@ const users: User[] = [
 users.forEach((u) => console.log(\`\${u.name} is \${u.age}\`));
 `;
 
-const java = `// Java — PLInt
+const java = `// Java - PLInt
 public class Main {
   public static void main(String[] args) {
     for (int i = 0; i < 3; i++) System.out.println("Hello #" + i);
@@ -95,13 +95,13 @@ public class Main {
 }
 `;
 
-const kt = `// Kotlin — PLInt
+const kt = `// Kotlin - PLInt
 fun main() {
   (0 until 3).forEach { println("Hello #$it") }
 }
 `;
 
-const cs = `// C# — PLInt
+const cs = `// C# - PLInt
 using System;
 class Program {
   static void Main() {
@@ -110,26 +110,26 @@ class Program {
 }
 `;
 
-const fsharp = `// F# — PLInt
+const fsharp = `// F# - PLInt
 [<EntryPoint>]
 let main _ =
     for i in 0 .. 2 do printfn "Hello #%d" i
     0
 `;
 
-const swift = `// Swift — PLInt
+const swift = `// Swift - PLInt
 for i in 0..<3 {
   print("Hello #\\(i)")
 }
 `;
 
-const dart = `// Dart — PLInt
+const dart = `// Dart - PLInt
 void main() {
-  for (var i = 0; i < 3; i++) print('Hello #\$i');
+  for (var i = 0; i < 3; i++) print('Hello #$i');
 }
 `;
 
-const c = `// C — PLInt
+const c = `// C - PLInt
 #include <stdio.h>
 int main(void) {
   for (int i = 0; i < 3; i++) printf("Hello #%d\\n", i);
@@ -137,14 +137,14 @@ int main(void) {
 }
 `;
 
-const cpp = `// C++ — PLInt
+const cpp = `// C++ - PLInt
 #include <iostream>
 int main() {
   for (int i = 0; i < 3; i++) std::cout << "Hello #" << i << "\\n";
 }
 `;
 
-const rust = `// Rust — PLInt
+const rust = `// Rust - PLInt
 fn main() {
     for i in 0..3 {
         println!("Hello #{}", i);
@@ -152,7 +152,7 @@ fn main() {
 }
 `;
 
-const zig = `// Zig — PLInt
+const zig = `// Zig - PLInt
 const std = @import("std");
 pub fn main() !void {
     var i: u8 = 0;
@@ -162,19 +162,19 @@ pub fn main() !void {
 }
 `;
 
-const nim = `# Nim — PLInt
+const nim = `# Nim - PLInt
 for i in 0..2:
   echo "Hello #", i
 `;
 
-const nix = `# Nix — PLInt
+const nix = `# Nix - PLInt
 let
   greet = name: "Hello, \${name}!";
 in
   builtins.map (i: greet ("world #" + toString i)) [0 1 2]
 `;
 
-const go = `// Go — PLInt
+const go = `// Go - PLInt
 package main
 import "fmt"
 func main() {
@@ -182,55 +182,55 @@ func main() {
 }
 `;
 
-const haskell = `-- Haskell — PLInt
+const haskell = `-- Haskell - PLInt
 main :: IO ()
 main = mapM_ (\\i -> putStrLn ("Hello #" ++ show i)) [0..2]
 `;
 
-const ocaml = `(* OCaml — PLInt *)
+const ocaml = `(* OCaml - PLInt *)
 let () =
   for i = 0 to 2 do
     Printf.printf "Hello #%d\\n" i
   done
 `;
 
-const elixir = `# Elixir — PLInt
+const elixir = `# Elixir - PLInt
 for i <- 0..2, do: IO.puts("Hello ##{i}")
 `;
 
-const julia = `# Julia — PLInt
+const julia = `# Julia - PLInt
 for i in 0:2
   println("Hello #", i)
 end
 `;
 
-const haxe = `// Haxe — PLInt
+const haxe = `// Haxe - PLInt
 class Main {
   static function main() {
-    for (i in 0...3) trace('Hello #\$i');
+    for (i in 0...3) trace('Hello #$i');
   }
 }
 `;
 
-const sql = `-- SQL (SQLite dialect via sql.js) — PLInt
+const sql = `-- SQL (SQLite dialect via sql.js) - PLInt
 CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INT);
 INSERT INTO users (name, age) VALUES ('Ada', 36), ('Linus', 55), ('Grace', 85);
 SELECT name, age FROM users ORDER BY age DESC;
 `;
 
 const bash = `#!/usr/bin/env bash
-# Bash — PLInt
+# Bash - PLInt
 for i in 1 2 3; do
   echo "Hello #$i"
 done
 `;
 
-const ps = `# PowerShell — PLInt
+const ps = `# PowerShell - PLInt
 1..3 | ForEach-Object { Write-Host "Hello #$_" }
 `;
 
 const bat = `@echo off
-REM Batch — PLInt
+REM Batch - PLInt
 for /L %%i in (1,1,3) do echo Hello #%%i
 `;
 
@@ -238,7 +238,7 @@ const html = `<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>PLInt — HTML</title>
+    <title>PLInt - HTML</title>
     <style>
       body { font-family: system-ui, sans-serif; background: #0f1418; color: #e3ecf1; padding: 2rem; }
       h1 { color: #b8ecdc; }
@@ -253,7 +253,7 @@ const html = `<!doctype html>
 `;
 
 // --- weird ---
-const svelte = `<!-- Svelte — PLInt -->
+const svelte = `<!-- Svelte - PLInt -->
 <script>
   let count = 0;
 </script>
@@ -262,7 +262,7 @@ const svelte = `<!-- Svelte — PLInt -->
 </button>
 `;
 
-const smali = `# Smali — PLInt
+const smali = `# Smali - PLInt
 .class public LHello;
 .super Ljava/lang/Object;
 
@@ -500,15 +500,15 @@ export const WEIRD: LanguageDef[] = [
 
 // ---------------- extra core (JVM / BEAM) ----------------
 
-const scala = `// Scala — PLInt
+const scala = `// Scala - PLInt
 object Main extends App {
   (0 until 3).foreach(i => println(s"Hello #$i"))
 }
 `;
-const clojure = `; Clojure — PLInt
+const clojure = `; Clojure - PLInt
 (dotimes [i 3] (println (str "Hello #" i)))
 `;
-const erlang = `%% Erlang — PLInt
+const erlang = `%% Erlang - PLInt
 -module(main).
 -export([main/0]).
 main() ->
@@ -534,22 +534,22 @@ CORE.push(
 );
 
 // ---------------- more core (added Aug 2025) ----------------
-const objc = `// Objective-C — PLInt
+const objc = `// Objective-C - PLInt
 #import <Foundation/Foundation.h>
 int main() { @autoreleasepool { NSLog(@"Hello, world!"); } return 0; }
 `;
-const objcpp = `// Objective-C++ — PLInt
+const objcpp = `// Objective-C++ - PLInt
 #import <Foundation/Foundation.h>
 #include <string>
 int main() { @autoreleasepool { std::string s = "world"; NSLog(@"Hello, %s!", s.c_str()); } return 0; }
 `;
-const crystal = `# Crystal — PLInt
+const crystal = `# Crystal - PLInt
 3.times { |i| puts "Hello ##{i}" }
 `;
-const vlang = `// V — PLInt
+const vlang = `// V - PLInt
 fn main() { for i in 0 .. 3 { println('Hello #$i') } }
 `;
-const gleam = `// Gleam — PLInt
+const gleam = `// Gleam - PLInt
 import gleam/io
 pub fn main() { io.println("Hello, world!") }
 `;
@@ -557,16 +557,16 @@ const solidity = `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 contract Hello { function greet() public pure returns (string memory) { return "Hello, world!"; } }
 `;
-const elm = `-- Elm — PLInt
+const elm = `-- Elm - PLInt
 module Main exposing (main)
 import Html exposing (text)
 main = text "Hello, world!"
 `;
-const dlang = `// D — PLInt
+const dlang = `// D - PLInt
 import std.stdio;
 void main() { foreach (i; 0 .. 3) writeln("Hello #", i); }
 `;
-const fortran = `! Fortran — PLInt
+const fortran = `! Fortran - PLInt
 program hello
   integer :: i
   do i = 0, 2
@@ -580,10 +580,10 @@ const cobol = `       IDENTIFICATION DIVISION.
            DISPLAY "Hello, world!".
            STOP RUN.
 `;
-const awk = `# AWK — PLInt
+const awk = `# AWK - PLInt
 BEGIN { for (i = 0; i < 3; i++) print "Hello #" i }
 `;
-const clisp = `;; Common Lisp — PLInt
+const clisp = `;; Common Lisp - PLInt
 (dotimes (i 3) (format t "Hello #~a~%" i))
 `;
 
@@ -627,11 +627,11 @@ CORE.push(
 );
 
 // ---------------- more core (2026 batch) ----------------
-const coffee = `# CoffeeScript — PLInt
+const coffee = `# CoffeeScript - PLInt
 greet = (name) -> "Hello, #{name}!"
 console.log greet "world ##{i}" for i in [0...3]
 `;
-const actionscript = `// ActionScript 3 — PLInt
+const actionscript = `// ActionScript 3 - PLInt
 package {
   public class Hello {
     public function Hello() {
@@ -640,7 +640,7 @@ package {
   }
 }
 `;
-const matlab = `% MATLAB / Octave — PLInt
+const matlab = `% MATLAB / Octave - PLInt
 function greet(name)
   fprintf("Hello, %s!\\n", name);
 end
@@ -648,7 +648,7 @@ for i = 0:2
   greet(sprintf("world #%d", i));
 end
 `;
-const ada = `-- Ada — PLInt
+const ada = `-- Ada - PLInt
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Hello is
 begin
@@ -657,7 +657,7 @@ begin
   end loop;
 end Hello;
 `;
-const pascal = `{ Pascal — PLInt }
+const pascal = `{ Pascal - PLInt }
 program Hello;
 var i: integer;
 begin
@@ -665,10 +665,10 @@ begin
     writeln('Hello #', i);
 end.
 `;
-const smalltalk = `"Smalltalk — PLInt"
+const smalltalk = `"Smalltalk - PLInt"
 1 to: 3 do: [:i | Transcript showCr: 'Hello #', i printString].
 `;
-const mojo = `# Mojo — PLInt
+const mojo = `# Mojo - PLInt
 fn greet(name: String) -> String:
     return "Hello, " + name + "!"
 
@@ -676,7 +676,7 @@ fn main():
     for i in range(3):
         print(greet("world #" + String(i)))
 `;
-const markdown = `# Markdown — PLInt
+const markdown = `# Markdown - PLInt
 
 A **live preview** renders below, just like the HTML runtime.
 
@@ -689,7 +689,7 @@ code block
 
 > Rendered client-side with a sandboxed, sanitized HTML preview.
 `;
-const groovy = `// Groovy — PLInt
+const groovy = `// Groovy - PLInt
 def greet(name) { "Hello, \${name}!" }
 (0..2).each { i -> println greet("world #\${i}") }
 `;
@@ -727,28 +727,28 @@ CORE.push(
 
 // ---------------- weird / esoteric extras ----------------
 
-const cmake = `# CMake — PLInt
+const cmake = `# CMake - PLInt
 cmake_minimum_required(VERSION 3.16)
 project(Hello LANGUAGES C)
 add_executable(hello hello.c)
 message(STATUS "Hello, world!")
 `;
-const makefile = `# Makefile — PLInt
+const makefile = `# Makefile - PLInt
 .PHONY: all
 all:
 \t@for i in 1 2 3; do echo "Hello #$$i"; done
 `;
 const whitespace = `   \t  \t   \n\t\n     \t\t \t  \t\n\t\n     \t \t \n\t\n  \n\n\n`;
 const binaryLang = `01001000 01100101 01101100 01101100 01101111 00100001
-; Binary — each 8-bit byte is one ASCII character.
+; Binary - each 8-bit byte is one ASCII character.
 `;
 const malbolgeU = `('&%:9]!~}|z2Vxwv-,POqponl$Hjig%eB@@>}=<M:9wv6WsU2T|nm-,jcL(I&%$#"
-; Malbolge Unshackled — same encrypted opcodes, unbounded tape width.
+; Malbolge Unshackled - same encrypted opcodes, unbounded tape width.
 `;
 const befunge = `"!dlroW ,olleH",,,,,,,,,,,,,@`;
-const piet = `# Piet — PLInt
+const piet = `# Piet - PLInt
 # Piet is a 2D visual language; source is an image of colored codels.
-# This text placeholder is for reference only — real programs are PNG images.
+# This text placeholder is for reference only - real programs are PNG images.
 `;
 const intercal = `PLEASE DO ,1 <- #13
 DO ,1 SUB #1 <- #238
@@ -784,7 +784,7 @@ const deadfish = `iiisiiiiiiiiioiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 const svelteAsm = ""; // placeholder unused
 
 // ---------- ASSEMBLY sample (shared, small) ----------
-const asmSample = (title: string) => `; ${title} — PLInt sample
+const asmSample = (title: string) => `; ${title} - PLInt sample
 ; Runs on PLInt's shared assembly simulator (see docs/ARCHITECTURE.md)
     mov     r0, 3
 loop:
@@ -794,7 +794,7 @@ loop:
     jg      loop
     halt
 `;
-const wat = `;; WebAssembly Text Format — PLInt
+const wat = `;; WebAssembly Text Format - PLInt
 (module
   (func $add (param i32 i32) (result i32)
     local.get 0
@@ -802,12 +802,12 @@ const wat = `;; WebAssembly Text Format — PLInt
     i32.add)
   (export "add" (func $add)))
 `;
-const llvmIr = `; LLVM IR — PLInt
+const llvmIr = `; LLVM IR - PLInt
 define i32 @main() {
   ret i32 0
 }
 `;
-const jasmin = `; Jasmin (JVM bytecode) — PLInt
+const jasmin = `; Jasmin (JVM bytecode) - PLInt
 .class public Hello
 .super java/lang/Object
 
@@ -819,7 +819,7 @@ const jasmin = `; Jasmin (JVM bytecode) — PLInt
    return
 .end method
 `;
-const cil = `// CIL / MSIL — PLInt
+const cil = `// CIL / MSIL - PLInt
 .assembly Hello {}
 .method static void Main() cil managed
 {
@@ -869,7 +869,7 @@ export const ESOTERIC: LanguageDef[] = [
   {
     id: "befunge", name: "Befunge", monaco: "plaintext", runtime: "server", serverId: "befunge",
     ext: ".bf98", sample: befunge, group: "esoteric",
-    syntax: { comment: "2D — no line comments", variable: "stack", fn: "n/a", io: ". , (out) & , ~ (in)", loop: "direction: > < ^ v", conditional: "_ | (H/V branch)" },
+    syntax: { comment: "2D - no line comments", variable: "stack", fn: "n/a", io: ". , (out) & , ~ (in)", loop: "direction: > < ^ v", conditional: "_ | (H/V branch)" },
   },
   {
     id: "piet", name: "Piet", monaco: "plaintext", runtime: "server", serverId: "piet",
@@ -957,7 +957,7 @@ export const ASSEMBLY: LanguageDef[] = [
   asm("asm-nasm", "NASM", ".asm"),
   asm("asm-masm", "MASM", ".asm"),
   asm("asm-gas", "GNU Assembler (GAS)", ".s"),
-  // New — main set
+  // New - main set
   asm("asm-sm83", "Game Boy / Sharp SM83 Assembly", ".asm"),
   asm("asm-ia64", "IA-64 / Itanium Assembly", ".s"),
   asm("asm-sh", "SuperH Assembly", ".s"),
@@ -965,7 +965,7 @@ export const ASSEMBLY: LanguageDef[] = [
   asm("asm-pdp11", "PDP-11 Assembly", ".mac"),
   asm("asm-vax", "VAX Assembly", ".s"),
   asm("asm-1802", "RCA 1802 COSMAC Assembly", ".asm"),
-  // Bonus — syntaxes & exotic
+  // Bonus - syntaxes & exotic
   asm("asm-aarch64", "AArch64 Assembly", ".s"),
   asm("asm-fasm", "FASM", ".asm"),
   asm("asm-yasm", "YASM", ".asm"),
@@ -975,7 +975,7 @@ export const ASSEMBLY: LanguageDef[] = [
   asm("asm-hla", "HLA (High-Level Assembly)", ".hla"),
   asm("asm-tricore", "Infineon TriCore Assembly", ".s"),
   asm("asm-hexagon", "Qualcomm Hexagon Assembly", ".s"),
-  // Requested batch — historical, embedded and vendor architectures
+  // Requested batch - historical, embedded and vendor architectures
   asm("asm-cdc6600", "CDC 6000 / 6600 Assembly", ".asm"),
   asm("asm-univac1100", "UNIVAC 1100/2200 Assembly", ".asm"),
   asm("asm-sgi-irix", "SGI MIPS / IRIX Assembly", ".s"),

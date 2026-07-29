@@ -22,16 +22,16 @@ const SettingsPanel = lazy(() =>
 export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "PLInt — Workspace" },
+      { title: "PLInt - Workspace" },
       {
         name: "description",
         content:
           "The PLInt workspace: run and edit code in 125+ programming languages, with saved files, live errors and full syntax highlighting.",
       },
-      { property: "og:title", content: "PLInt — Workspace" },
+      { property: "og:title", content: "PLInt - Workspace" },
       {
         property: "og:description",
-        content: "Run 125+ programming languages online — instantly, in one tab.",
+        content: "Run 125+ programming languages online - instantly, in one tab.",
       },
     ],
   }),
@@ -93,13 +93,9 @@ function PLInt() {
     applyDensity(cfg.density);
   }, []);
 
-  // Drive the collapsible sidebar panel via imperative ref so its
-  // last-expanded size is preserved across toggles. react-resizable-panels
-  // applies `className`/`style` to a nested wrapper div, not the actual
-  // flex-sized root element, so a CSS transition on flex has to be toggled
-  // directly on the root via `elementRef` instead — otherwise it never
-  // animates. The class is only added for a brief window so drag-resize
-  // stays instant the rest of the time.
+  // react-resizable-panels applies className/style to a nested wrapper,
+  // not the flex-sized root, so the collapse transition has to be
+  // toggled on elementRef directly, only briefly so drag stays instant.
   const sidebarElRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const p = sidebarPanelRef.current;

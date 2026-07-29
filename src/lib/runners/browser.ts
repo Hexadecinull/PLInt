@@ -6,11 +6,10 @@ import { emptyResult } from "./types";
 
 // -------- shared loader helpers --------
 
-
 // Dynamic-import URLs via a variable so TypeScript's module resolver doesn't
 // try to resolve remote URLs at build time.
-const cdnImport = (url: string): Promise<any> =>
-  (new Function("u", "return import(/* @vite-ignore */ u)"))(url);
+const cdnImport = (url: string): Promise<Record<string, unknown>> =>
+  new Function("u", "return import(/* @vite-ignore */ u)")(url);
 
 const scriptCache = new Map<string, Promise<void>>();
 function loadScript(src: string): Promise<void> {
@@ -48,7 +47,6 @@ export async function runJs(code: string): Promise<RunResult> {
     debug: (...a: unknown[]) => stdout.push(a.map(fmt).join(" ")),
   };
   try {
-    // eslint-disable-next-line no-new-func
     const fn = new Function("console", `"use strict"; return (async () => { ${code}\n })();`);
     await fn(patchedConsole);
     res.ok = true;
@@ -64,7 +62,11 @@ export async function runJs(code: string): Promise<RunResult> {
 
 function fmt(v: unknown): string {
   if (typeof v === "string") return v;
-  try { return JSON.stringify(v, null, 2); } catch { return String(v); }
+  try {
+    return JSON.stringify(v, null, 2);
+  } catch {
+    return String(v);
+  }
 }
 
 function formatError(e: unknown): string {
@@ -72,12 +74,28 @@ function formatError(e: unknown): string {
   return String(e);
 }
 
-// -------- TypeScript (transpile → JS) --------
+// -------- TypeScript (transpile to JS) --------
+
+interface TsDiagnostic {
+  category: number;
+  messageText: unknown;
+  file?: { getLineAndCharacterOfPosition: (pos: number) => { line: number; character: number } };
+  start?: number;
+}
+interface TsModule {
+  transpileModule: (
+    code: string,
+    opts: unknown
+  ) => { outputText: string; diagnostics?: TsDiagnostic[] };
+  ScriptTarget: Record<string, unknown>;
+  ModuleKind: Record<string, unknown>;
+  flattenDiagnosticMessageText: (msg: unknown, sep: string) => string;
+}
 
 export async function runTs(code: string): Promise<RunResult> {
-  const ts = await once<any>("typescript", async () => {
+  const ts = await once<TsModule>("typescript", async () => {
     const mod = await cdnImport("https://esm.sh/typescript@5.6.3");
-    return mod.default ?? mod;
+    return (mod.default ?? mod) as TsModule;
   });
   const diagnostics: Diagnostic[] = [];
   const out = ts.transpileModule(code, {
@@ -86,8 +104,7 @@ export async function runTs(code: string): Promise<RunResult> {
       module: ts.ModuleKind.ESNext,
       strict: false,
       esModuleInterop: true,
-      // Intentionally omit `jsx` — leaving it unset avoids
-      // `Argument for '--jsx' option must be: ...` on some TS builds.
+      // jsx is intentionally left unset, some TS builds reject the option.
     },
     reportDiagnostics: true,
   });
@@ -101,7 +118,10 @@ export async function runTs(code: string): Promise<RunResult> {
     }
     diagnostics.push({
       severity: d.category === 1 ? "error" : d.category === 0 ? "warning" : "info",
-      message: msg, line, column, source: "tsc",
+      message: msg,
+      line,
+      column,
+      source: "tsc",
     });
   }
   const result = await runJs(out.outputText);
@@ -111,8 +131,14 @@ export async function runTs(code: string): Promise<RunResult> {
 
 // -------- Python (Pyodide) --------
 
+interface PyodideInterface {
+  setStdout: (opts: { batched: (s: string) => void }) => void;
+  setStderr: (opts: { batched: (s: string) => void }) => void;
+  runPythonAsync: (code: string) => Promise<unknown>;
+}
+
 export async function runPython(code: string): Promise<RunResult> {
-  const pyodide = await once<any>("pyodide", async () => {
+  const pyodide = await once<PyodideInterface>("pyodide", async () => {
     await loadScript("https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js");
     // @ts-expect-error injected by pyodide.js
     return await window.loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/" });
@@ -138,11 +164,19 @@ export async function runPython(code: string): Promise<RunResult> {
 
 // -------- Lua (wasmoon) --------
 
+interface LuaEngine {
+  global: { set: (name: string, fn: (...a: unknown[]) => void) => void; close: () => void };
+  doString: (code: string) => Promise<unknown>;
+}
+interface LuaFactory {
+  createEngine: () => Promise<LuaEngine>;
+}
+
 export async function runLua(code: string): Promise<RunResult> {
-  const factory = await once<any>("lua", async () => {
+  const factory = await once<LuaFactory>("lua", async () => {
     const mod = await cdnImport("https://esm.sh/wasmoon@1.16.0");
-    const f = new mod.LuaFactory();
-    return f;
+    const Ctor = mod.LuaFactory as new () => LuaFactory;
+    return new Ctor();
   });
   const res = emptyResult();
   const start = performance.now();
@@ -165,12 +199,20 @@ export async function runLua(code: string): Promise<RunResult> {
   return res;
 }
 
-// -------- SQL (sql.js — SQLite) --------
+// -------- SQL (sql.js, SQLite compiled to WASM) --------
+
+interface SqlJsDatabase {
+  exec: (sql: string) => { columns: string[]; values: unknown[][] }[];
+  close: () => void;
+}
+interface SqlJsStatic {
+  Database: new () => SqlJsDatabase;
+}
 
 export async function runSql(code: string): Promise<RunResult> {
-  const SQL = await once<any>("sql", async () => {
+  const SQL = await once<SqlJsStatic>("sql", async () => {
     const mod = await cdnImport("https://esm.sh/sql.js@1.11.0");
-    const initSqlJs = (mod.default ?? mod);
+    const initSqlJs = (mod.default ?? mod) as (opts: unknown) => Promise<SqlJsStatic>;
     return await initSqlJs({ locateFile: (f: string) => `https://esm.sh/sql.js@1.11.0/dist/${f}` });
   });
   const res = emptyResult();
@@ -210,10 +252,21 @@ function formatSqlTable(cols: string[], rows: unknown[][]): string {
 
 // -------- Ruby (ruby.wasm) --------
 
+interface RubyValue {
+  toString: () => string;
+}
+interface RubyVM {
+  eval: (code: string) => RubyValue;
+}
+
 export async function runRuby(code: string): Promise<RunResult> {
-  const vm = await once<any>("ruby", async () => {
-    const mod = await cdnImport("https://cdn.jsdelivr.net/npm/@ruby/3.3-wasm-wasi@2.7.1/dist/browser/+esm");
-    const { DefaultRubyVM } = mod;
+  const vm = await once<RubyVM>("ruby", async () => {
+    const mod = await cdnImport(
+      "https://cdn.jsdelivr.net/npm/@ruby/3.3-wasm-wasi@2.7.1/dist/browser/+esm"
+    );
+    const DefaultRubyVM = mod.DefaultRubyVM as (
+      wasm: WebAssembly.Module
+    ) => Promise<{ vm: RubyVM }>;
     const response = await fetch(
       "https://cdn.jsdelivr.net/npm/@ruby/3.3-wasm-wasi@2.7.1/dist/ruby+stdlib.wasm"
     );
@@ -226,7 +279,7 @@ export async function runRuby(code: string): Promise<RunResult> {
   const stdout: string[] = [];
   const stderr: string[] = [];
   try {
-    // Redirect $stdout/$stderr through a StringIO so we can capture output.
+    // Redirect $stdout/$stderr through a StringIO to capture output.
     vm.eval(`
       require "stringio"
       $__plint_out = StringIO.new
@@ -255,11 +308,18 @@ export async function runRuby(code: string): Promise<RunResult> {
 
 // -------- PHP (php-wasm) --------
 
+interface PhpWebInstance {
+  binary: Promise<unknown>;
+  addEventListener: (type: string, listener: (e: CustomEvent<string>) => void) => void;
+  removeEventListener: (type: string, listener: (e: CustomEvent<string>) => void) => void;
+  run: (code: string) => Promise<number>;
+}
+
 export async function runPhp(code: string): Promise<RunResult> {
-  const php = await once<any>("php", async () => {
+  const php = await once<PhpWebInstance>("php", async () => {
     const mod = await cdnImport("https://esm.sh/php-wasm@0.0.9/PhpWeb.mjs");
-    const { PhpWeb } = mod;
-    const p = new PhpWeb();
+    const Ctor = mod.PhpWeb as new () => PhpWebInstance;
+    const p = new Ctor();
     await p.binary;
     return p;
   });
@@ -267,8 +327,8 @@ export async function runPhp(code: string): Promise<RunResult> {
   const start = performance.now();
   const stdout: string[] = [];
   const stderr: string[] = [];
-  const onOut = (e: any) => stdout.push(e.detail);
-  const onErr = (e: any) => stderr.push(e.detail);
+  const onOut = (e: CustomEvent<string>) => stdout.push(e.detail);
+  const onErr = (e: CustomEvent<string>) => stderr.push(e.detail);
   php.addEventListener("output", onOut);
   php.addEventListener("error", onErr);
   try {
@@ -298,13 +358,17 @@ export async function runHtml(code: string): Promise<RunResult> {
   return res;
 }
 
-// -------- CoffeeScript (compile → JS, then run like JS) --------
+// -------- CoffeeScript (compile to JS, then run like JS) --------
+
+interface CoffeeScriptModule {
+  compile: (code: string, opts: { bare: boolean }) => string;
+}
 
 export async function runCoffeeScript(code: string): Promise<RunResult> {
   const start = performance.now();
-  const coffee = await once<any>("coffeescript", async () => {
+  const coffee = await once<CoffeeScriptModule>("coffeescript", async () => {
     const mod = await cdnImport("https://esm.sh/coffeescript@2.7.0");
-    return mod.default ?? mod;
+    return (mod.default ?? mod) as CoffeeScriptModule;
   });
   try {
     const js = coffee.compile(code, { bare: true });
@@ -322,16 +386,23 @@ export async function runCoffeeScript(code: string): Promise<RunResult> {
 
 // -------- Markdown (sanitized live HTML preview, same pathway as HTML) --------
 
+interface MarkedFn {
+  parse: (src: string, opts: unknown) => string | Promise<string>;
+}
+interface DomPurifyLike {
+  sanitize: (html: string) => string;
+}
+
 export async function runMarkdown(code: string): Promise<RunResult> {
   const res = emptyResult();
   const start = performance.now();
   try {
     const [markedMod, dompurifyMod] = await Promise.all([
-      once<any>("marked", () => cdnImport("https://esm.sh/marked@13.0.3")),
-      once<any>("dompurify", () => cdnImport("https://esm.sh/dompurify@3.1.6")),
+      once<Record<string, unknown>>("marked", () => cdnImport("https://esm.sh/marked@13.0.3")),
+      once<Record<string, unknown>>("dompurify", () => cdnImport("https://esm.sh/dompurify@3.1.6")),
     ]);
-    const marked = markedMod.marked ?? markedMod.default ?? markedMod;
-    const DOMPurify = dompurifyMod.default ?? dompurifyMod;
+    const marked = (markedMod.marked ?? markedMod.default ?? markedMod) as MarkedFn;
+    const DOMPurify = (dompurifyMod.default ?? dompurifyMod) as DomPurifyLike;
     const rawHtml = await marked.parse(code, { breaks: true, gfm: true });
     res.html = DOMPurify.sanitize(rawHtml);
     res.stdout = "(rendered preview above)";
@@ -352,7 +423,8 @@ export async function runBrainfuck(code: string): Promise<RunResult> {
   const out: string[] = [];
   try {
     const tape = new Uint8Array(30000);
-    let ptr = 0, pc = 0;
+    let ptr = 0,
+      pc = 0;
     // Pre-compute jump table for [ and ].
     const jumps = new Map<number, number>();
     const stack: number[] = [];
@@ -361,7 +433,8 @@ export async function runBrainfuck(code: string): Promise<RunResult> {
       else if (code[i] === "]") {
         const s = stack.pop();
         if (s == null) throw new Error("Unmatched ] at position " + i);
-        jumps.set(s, i); jumps.set(i, s);
+        jumps.set(s, i);
+        jumps.set(i, s);
       }
     }
     if (stack.length) throw new Error("Unmatched [ at position " + stack[0]);
@@ -372,14 +445,30 @@ export async function runBrainfuck(code: string): Promise<RunResult> {
       if (++steps > MAX_STEPS) throw new Error("Execution limit reached (" + MAX_STEPS + " steps)");
       const c = code[pc];
       switch (c) {
-        case ">": ptr = (ptr + 1) % 30000; break;
-        case "<": ptr = (ptr - 1 + 30000) % 30000; break;
-        case "+": tape[ptr] = (tape[ptr] + 1) & 0xff; break;
-        case "-": tape[ptr] = (tape[ptr] - 1) & 0xff; break;
-        case ".": out.push(String.fromCharCode(tape[ptr])); break;
-        case ",": tape[ptr] = 0; break; // no stdin
-        case "[": if (tape[ptr] === 0) pc = jumps.get(pc)!; break;
-        case "]": if (tape[ptr] !== 0) pc = jumps.get(pc)!; break;
+        case ">":
+          ptr = (ptr + 1) % 30000;
+          break;
+        case "<":
+          ptr = (ptr - 1 + 30000) % 30000;
+          break;
+        case "+":
+          tape[ptr] = (tape[ptr] + 1) & 0xff;
+          break;
+        case "-":
+          tape[ptr] = (tape[ptr] - 1) & 0xff;
+          break;
+        case ".":
+          out.push(String.fromCharCode(tape[ptr]));
+          break;
+        case ",":
+          tape[ptr] = 0; // no stdin
+          break;
+        case "[":
+          if (tape[ptr] === 0) pc = jumps.get(pc)!;
+          break;
+        case "]":
+          if (tape[ptr] !== 0) pc = jumps.get(pc)!;
+          break;
       }
       pc++;
     }

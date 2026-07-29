@@ -26,13 +26,13 @@ export interface Settings {
   density: "compact" | "comfortable";
   reducedMotion: boolean;
   customAccentHex?: string;
-  // Editor — added for finer control over Monaco's feel.
+  // Editor - added for finer control over Monaco's feel.
   smoothScrolling: boolean;
   mouseWheelZoom: boolean;
   formatOnPaste: boolean;
   renderLineHighlight: "none" | "gutter" | "line" | "all";
   rulers: boolean;
-  // Workspace — behavior of the app shell itself, not just the editor.
+  // Workspace - behavior of the app shell itself, not just the editor.
   confirmBeforeDelete: boolean;
   autoRunOnChange: boolean;
   defaultLanguage: string;
@@ -135,7 +135,7 @@ const ACCENT_MAP: Record<Exclude<AccentId, "custom">, { primary: string; glow: s
 
 
 // CSS variables that get tinted with the accent hue when Deep accent is on.
-// Values are `[L, C]` — chroma varies per surface so lower layers stay subtle.
+// Values are `[L, C]` - chroma varies per surface so lower layers stay subtle.
 const DEEP_DARK_SURFACES: [string, number, number][] = [
   ["--background", 0.13, 0.028],
   ["--surface",    0.16, 0.032],

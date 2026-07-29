@@ -2,7 +2,7 @@
 
 This document describes what data PLInt itself collects and stores. If
 you're using someone else's PLInt instance, this describes the software's
-behavior — the operator of that specific instance is responsible for how
+behavior - the operator of that specific instance is responsible for how
 they run it, and may have their own policy on top of this one.
 
 ## Short version
@@ -23,7 +23,7 @@ system, no analytics, and no tracking.
 
 None of this is sent anywhere unless you explicitly export/download it, or
 run a language that requires server-side execution (in which case only the
-code buffer for that run is sent — see below). Clearing your browser's
+code buffer for that run is sent - see below). Clearing your browser's
 site data for this domain removes all of it, and there's no server-side
 copy to recover it from.
 
@@ -31,11 +31,11 @@ copy to recover it from.
 
 - **Code you run**, for any language whose execution happens server-side
   (see [ARCHITECTURE.md](ARCHITECTURE.md) for which languages those are).
-  This is sent to run it and is not persisted afterward — each run happens
+  This is sent to run it and is not persisted afterward - each run happens
   in a fresh temporary directory that's deleted immediately after.
 - **Assembly variant names** you submit via the "Don't see your Assembly?"
   form. These are appended to a server-side text file that only the
-  instance operator can read from their own terminal — see
+  instance operator can read from their own terminal - see
   [USAGE.md](USAGE.md) and [DEPLOY.md](DEPLOY.md). Submit only the name of
   the variant; don't include anything you wouldn't want the operator to
   read.
@@ -55,7 +55,7 @@ copy to recover it from.
 Browser-executed languages (Python, Lua, SQL, TypeScript, CoffeeScript,
 Markdown) load their runtime from a public CDN (esm.sh / jsDelivr) the
 first time you use that language in a session. That's a request to a
-third-party CDN, not to any server operated by this project — see that
+third-party CDN, not to any server operated by this project - see that
 CDN's own privacy policy if this matters to you. No code you write is sent
 to the CDN; only the runtime library itself is downloaded from it.
 

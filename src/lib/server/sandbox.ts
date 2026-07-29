@@ -19,24 +19,21 @@ export interface ExecOutcome {
   timedOut: boolean;
 }
 
-const MAX_OUTPUT = 200_000; // characters, per stream — keeps runaway output cheap to buffer
+const MAX_OUTPUT = 200_000; // characters, per stream - keeps runaway output cheap to buffer
 const DEFAULT_TIMEOUT_MS = 10_000;
 const DEFAULT_MEMORY_MB = 256;
 
 /**
  * Runs `cmd args...` inside `opts.cwd`, wrapped with `nice` (lower CPU
- * priority — this box is a decade-old laptop, not a build server) and a
- * `ulimit -v` memory ceiling. Always resolves; failures show up as a
- * non-zero exit code plus stderr rather than a thrown rejection, so callers
- * don't need a second error-handling path on top of the exit-code check.
+ * priority) and a `ulimit -v` memory ceiling. Always resolves. Failures
+ * show up as a non-zero exit code plus stderr, not a thrown rejection.
  */
 export function run(cmd: string, args: string[], opts: ExecOptions): Promise<ExecOutcome> {
   const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const memoryKB = (opts.memoryMB ?? DEFAULT_MEMORY_MB) * 1024;
 
-  // Quoting is safe here because every argument we ever pass through this
-  // path is a path we generated ourselves inside a fresh temp directory
-  // (alphanumeric + a fixed prefix) — never raw user text.
+  // Safe to quote directly: args here are always paths we generated
+  // ourselves in a fresh temp dir, never raw user text.
   const quoted = [cmd, ...args].map((a) => `'${a.replace(/'/g, `'\\''`)}'`).join(" ");
   const shCmd = `ulimit -v ${memoryKB} 2>/dev/null; exec ${quoted}`;
 

@@ -3,7 +3,7 @@
 #
 # Every language degrades gracefully when its tool isn't installed (PLInt
 # just tells you what to install), so you never have to run this whole
-# script — install only what you'll actually use. It's split into tiers
+# script - install only what you'll actually use. It's split into tiers
 # by disk/RAM cost since this is meant to run on modest hardware, not a
 # build server.
 #
@@ -23,7 +23,7 @@ for arg in "$@"; do
 done
 
 # ---------------------------------------------------------------------------
-# Tier 1 — small, fast, broadly useful. Roughly a few hundred MB combined.
+# Tier 1 - small, fast, broadly useful. Roughly a few hundred MB combined.
 # ---------------------------------------------------------------------------
 TIER1_APT=(
   perl gawk make cmake            # scripting / build-script languages
@@ -32,7 +32,7 @@ TIER1_APT=(
 )
 
 # ---------------------------------------------------------------------------
-# Tier 2 — heavier or more niche. Each of these is roughly 100-500MB;
+# Tier 2 - heavier or more niche. Each of these is roughly 100-500MB;
 # install only the ones you actually plan to use. A JDK in particular is
 # shared by Java, Kotlin, Groovy, Scala, and Clojure, so it's worth it if
 # you want any of those.
@@ -56,7 +56,7 @@ TIER2_APT=(
 )
 
 # ---------------------------------------------------------------------------
-# Not covered by apt at all — install manually only if you need them.
+# Not covered by apt at all - install manually only if you need them.
 # These either need a vendor installer/curl script, or are too heavy/
 # fragile for a general-purpose personal server by default.
 # ---------------------------------------------------------------------------
@@ -70,12 +70,12 @@ MANUAL_NOTES="
   julia      -> https://julialang.org/downloads
   scala      -> via coursier/sdkman, needs a JDK
   kotlin     -> via sdkman, needs a JDK
-  dotnet     -> apt install dotnet-sdk-8.0 (Microsoft's apt repo, ~500MB — for F#)
+  dotnet     -> apt install dotnet-sdk-8.0 (Microsoft's apt repo, ~500MB - for F#)
   gleam      -> https://gleam.run/getting-started
-  llvm       -> apt install llvm (for LLVM IR / \`lli\` — quite large, several hundred MB)
+  llvm       -> apt install llvm (for LLVM IR / \`lli\` - quite large, several hundred MB)
   mono-devel -> apt install mono-devel (adds \`ilasm\` for CIL/MSIL, on top of mono-runtime above)
   jasmin     -> download jasmin.jar, set JASMIN_JAR in .env (see .env.example)
-  mojo       -> https://www.modular.com/mojo (multi-GB toolchain — skip unless you really need it)
+  mojo       -> https://www.modular.com/mojo (multi-GB toolchain - skip unless you really need it)
   gnustep    -> apt install gnustep-base-runtime gobjc (Objective-C / Objective-C++)
 "
 
@@ -100,13 +100,13 @@ if $TIER2; then
 else
   echo
   echo "Skipped Tier 2 (heavier/more niche languages). Run with --tier2 to include them,"
-  echo "or install individual packages later — see: bash $0 --list"
+  echo "or install individual packages later - see: bash $0 --list"
 fi
 
 echo
 echo "Languages with no apt package (Rust, Swift, Dart, Julia, .NET, etc.) need a manual"
-echo "install — run: bash $0 --list"
+echo "install - run: bash $0 --list"
 echo
-echo "Done. PLInt picks up newly installed interpreters automatically — no restart needed"
+echo "Done. PLInt picks up newly installed interpreters automatically - no restart needed"
 echo "for the interpreter itself, though a PM2 restart doesn't hurt if something seems stale:"
 echo "  pm2 restart plint"

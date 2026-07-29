@@ -1,8 +1,7 @@
 # Terms of Service
 
 These are template terms for anyone operating a PLInt instance. If you're
-using someone else's instance, the operator may present their own terms —
-these are meant as a reasonable default, not a binding agreement from the
+using someone else's instance, the operator may present their own terms - these are meant as a reasonable default, not a binding agreement from the
 PLInt project itself (which doesn't operate a public instance).
 
 ## 1. What this is
@@ -68,7 +67,7 @@ acceptance of the updated terms.
 
 ## 8. License
 
-PLInt itself is open-source software licensed under AGPL-3.0 — see
+PLInt itself is open-source software licensed under AGPL-3.0 - see
 [LICENSE](../LICENSE). These terms govern *use of a running instance*, not
 your rights to the underlying source code, which are governed by the
 license.

@@ -14,7 +14,7 @@ Please include:
 - Steps to reproduce.
 - The version/commit you tested against.
 
-There's no bug bounty — this is a hobby/personal project — but reports are
+There's no bug bounty - this is a hobby/personal project - but reports are
 taken seriously and credited in release notes unless you'd rather stay
 anonymous.
 
@@ -52,15 +52,15 @@ front of the execution backend.
 
 ### Recommendations if you self-host
 
-- **Run PLInt as a dedicated, unprivileged system user** — never as root,
+- **Run PLInt as a dedicated, unprivileged system user** - never as root,
   and ideally not as your everyday login user. `ecosystem.config.cjs`
   doesn't set a user for you; configure that at the OS/systemd level if
   you want PM2 itself to run under a restricted account.
-- **Treat it like you'd treat SSH access** — only give the URL to people
+- **Treat it like you'd treat SSH access** - only give the URL to people
   you'd trust with a shell on the box, unless you've added your own
   container-level sandboxing on top.
 - **Keep the server patched.** This is a general Linux server, not a
-  black box — normal `apt upgrade` hygiene applies.
+  black box - normal `apt upgrade` hygiene applies.
 - **The GitHub webhook secret is a real credential.** Treat
   `GITHUB_WEBHOOK_SECRET` like a password; anyone who has it (and access to
   your webhook endpoint) can trigger a redeploy from an arbitrary commit on
@@ -74,4 +74,4 @@ front of the execution backend.
 
 The lint CI workflow doesn't currently include automated dependency
 vulnerability scanning. If you'd like to add Dependabot or a similar tool,
-pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+pull requests are welcome - see [CONTRIBUTING.md](CONTRIBUTING.md).

@@ -11,8 +11,8 @@ interface Props {
 }
 
 export function EditorPane({ language, value, onChange }: Props) {
-  const editorRef = useRef<any>(null);
-  const monacoRef = useRef<any>(null);
+  const editorRef = useRef<Parameters<OnMount>[0] | null>(null);
+  const monacoRef = useRef<Parameters<OnMount>[1] | null>(null);
   const [ready, setReady] = useState(false);
   const [settings] = useSettings();
 

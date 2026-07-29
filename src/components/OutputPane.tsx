@@ -20,7 +20,7 @@ export function OutputPane({ running, result, onClear }: Props) {
             <span className="h-2.5 w-2.5 rounded-full bg-success/70" />
           </div>
           <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-            output — /bin/plint
+            output - /bin/plint
           </span>
           {running && <StatusBadge kind="running">running</StatusBadge>}
           {!running && result && (
@@ -103,7 +103,7 @@ export function OutputPane({ running, result, onClear }: Props) {
                 )}
                 <span className="whitespace-pre-wrap">{d.message}</span>
                 {d.source && (
-                  <span className="ml-2 text-[10px] opacity-50">— {d.source}</span>
+                  <span className="ml-2 text-[10px] opacity-50">- {d.source}</span>
                 )}
               </div>
             ))}

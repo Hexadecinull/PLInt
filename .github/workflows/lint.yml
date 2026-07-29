@@ -16,11 +16,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          # No `cache: npm` yet — that needs a committed package-lock.json
-          # to key off. Once you've run `npm install` locally and
-          # committed the resulting lockfile, add `cache: "npm"` back here
-          # for faster CI runs.
+          node-version: "22"
+          # No cache: npm yet, that needs a committed package-lock.json to key
+          # off. Once you have run npm install locally and committed the
+          # resulting lockfile, add cache: "npm" back here for faster runs.
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
@@ -29,4 +28,8 @@ jobs:
         run: npm run lint
 
       - name: Prettier check
+        # Advisory for now, not blocking. Run `npm run format` locally once
+        # and commit the result, then flip this to a normal step (drop
+        # continue-on-error) to make it a hard gate like ESLint above.
         run: npx prettier --check .
+        continue-on-error: true

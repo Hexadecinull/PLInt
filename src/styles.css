@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * PLInt — minimalist UI with a Linux-terminal flavor.
+ * PLInt - minimalist UI with a Linux-terminal flavor.
  * All colors are OKLCH tokens; no ad-hoc colors in components.
  */
 
@@ -79,8 +79,7 @@
   --input: oklch(0.22 0.006 240);
   --ring: oklch(0.82 0.14 185);
 
-  /* The output terminal (OutputPane) always renders on a fixed dark
-     background, in both light and dark app themes, so its text needs
+  /* OutputPane's terminal is always dark in both app themes, so it needs
      its own tokens instead of the theme-following --foreground family. */
   --terminal-fg: oklch(0.94 0.005 240);
   --terminal-dim: oklch(0.62 0.008 240);
@@ -92,7 +91,7 @@
   --shadow-panel: 0 20px 60px -30px oklch(0 0 0 / 0.7);
 }
 
-/* Light theme — same tokens, inverted lightness. */
+/* Light theme - same tokens, inverted lightness. */
 :root.light {
   --background: oklch(0.985 0.004 240);
   --foreground: oklch(0.18 0.008 240);
@@ -122,7 +121,7 @@
   --shadow-panel: 0 20px 60px -30px oklch(0 0 0 / 0.2);
 }
 
-/* Density mode — quietly tightens paddings in a few spots. */
+/* Density mode - quietly tightens paddings in a few spots. */
 :root[data-density="compact"] {
   --radius: 0.3rem;
 }
@@ -255,7 +254,7 @@
 [data-state="open"][data-anim="drawer"]   { animation: plint-drawer-in var(--dur-base) var(--ease) both; }
 [data-state="closed"][data-anim="drawer"] { animation: plint-drawer-out var(--dur-base) var(--ease) both; }
 
-/* Sidebar collapse — animate the inner wrapper's opacity/translate so the
+/* Sidebar collapse - animate the inner wrapper's opacity/translate so the
    panel resize feels intentional. */
 [data-sidebar-inner][data-collapsed="true"] {
   opacity: 0;
@@ -294,10 +293,8 @@ button, a, input, select, textarea {
     transform var(--dur-fast) var(--ease);
 }
 
-/* Sidebar collapse/expand animation: applied imperatively (via elementRef,
-   see routes/app.tsx) directly to the Panel's real flex-sized root element,
-   only for a brief window (~280ms) after toggling, so drag-resize stays
-   instant the rest of the time. */
+/* Applied imperatively via elementRef (see routes/app.tsx) to the real
+   flex-sized panel root, only briefly after toggling so drag stays instant. */
 .sidebar-anim {
   transition:
     flex-grow 260ms cubic-bezier(0.4, 0, 0.2, 1),

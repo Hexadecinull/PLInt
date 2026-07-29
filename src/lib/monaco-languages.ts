@@ -1,7 +1,7 @@
 // Register Monarch tokenizers for languages Monaco doesn't ship out of the box:
 // Haxe, Zig, Nim, Nix, Brainfuck, LOLCODE, Shakespeare, Malbolge, Smali, Svelte,
 // ActionScript, MATLAB, Ada, Smalltalk, Groovy.
-// Registration is idempotent — called from EditorPane's beforeMount hook.
+// Registration is idempotent - called from EditorPane's beforeMount hook.
 
 type Monaco = typeof import("monaco-editor");
 
@@ -36,7 +36,7 @@ export function registerCustomLanguages(monaco: Monaco) {
           [/[a-z_$][\w$]*/, {
             cases: { "@keywords": "keyword", "@default": "identifier" },
           }],
-          [/[{}()\[\]]/, "@brackets"],
+          [/[{}()[\]]/, "@brackets"],
           [/[<>=!+\-*/%&|^~?:.]+/, "operator"],
         ],
         comment: [
@@ -75,7 +75,7 @@ export function registerCustomLanguages(monaco: Monaco) {
           [/[a-zA-Z_][\w]*/, {
             cases: { "@keywords": "keyword", "@typeKeywords": "type", "@default": "identifier" },
           }],
-          [/[{}()\[\]]/, "@brackets"],
+          [/[{}()[\]]/, "@brackets"],
           [/[<>=!+\-*/%&|^~?:.]+/, "operator"],
         ],
       },
@@ -103,7 +103,7 @@ export function registerCustomLanguages(monaco: Monaco) {
           [/[a-zA-Z_][\w]*/, {
             cases: { "@keywords": "keyword", "@default": "identifier" },
           }],
-          [/[{}()\[\]]/, "@brackets"],
+          [/[{}()[\]]/, "@brackets"],
           [/[<>=!+\-*/%&|^~?:.]+/, "operator"],
         ],
       },
@@ -127,7 +127,7 @@ export function registerCustomLanguages(monaco: Monaco) {
           [/[a-zA-Z_][\w'-]*/, {
             cases: { "@keywords": "keyword", "@default": "identifier" },
           }],
-          [/[{}()\[\]]/, "@brackets"],
+          [/[{}()[\]]/, "@brackets"],
           [/[=:;,.]/, "delimiter"],
           [/[<>+\-*/!?&|]+/, "operator"],
         ],
@@ -151,10 +151,10 @@ export function registerCustomLanguages(monaco: Monaco) {
       defaultToken: "comment",
       tokenizer: {
         root: [
-          [/[+\-]/, "number"],
+          [/[+-]/, "number"],
           [/[<>]/, "type"],
           [/[.,]/, "string"],
-          [/[\[\]]/, "keyword"],
+          [/[[\]]/, "keyword"],
         ],
       },
     });
@@ -283,7 +283,7 @@ export function registerCustomLanguages(monaco: Monaco) {
             cases: { "@keywords": "keyword", "@default": "identifier" },
           }],
           [/\b\d+(\.\d+)?\b/, "number"],
-          [/[{}()\[\]]/, "@brackets"],
+          [/[{}()[\]]/, "@brackets"],
           [/[<>=!+\-*/|:;,.]+/, "operator"],
         ],
       },
@@ -307,7 +307,7 @@ export function registerCustomLanguages(monaco: Monaco) {
           [/%?\b(?:e?[abcd]x|[abcd][hl]|e?[sd]i|e?[bs]p|r\d+[bdw]?|r[abcd]x|r[sd]i|r[bs]p|xmm\d+|ymm\d+|zmm\d+|st\d+|cr\d+|dr\d+|[xwbhd]\d+|sp|lr|pc|fp|zero|ra|gp|tp|[stwafv]\d+)\b/, "variable"],
           [/\$?-?\b0x[0-9a-fA-F]+\b|#?-?\b\d+\b/, "number"],
           [/[a-zA-Z_][\w.]*/, "identifier"],
-          [/[,()\[\]{}]/, "delimiter"],
+          [/[,()[\]{}]/, "delimiter"],
           [/[+\-*/=<>!&|~^]/, "operator"],
         ],
       },
@@ -346,14 +346,14 @@ export function registerCustomLanguages(monaco: Monaco) {
           [/\b(?:define|declare|ret|br|switch|call|invoke|alloca|load|store|getelementptr|icmp|fcmp|add|sub|mul|sdiv|udiv|and|or|xor|shl|lshr|ashr|phi|select|bitcast|trunc|zext|sext|ptrtoint|inttoptr|to|label|void|null|true|false|constant|global|internal|external|private|dso_local|nounwind|noinline|nocapture|readonly|readnone|align)\b/, "keyword"],
           [/\bi\d+\b|\b(?:half|float|double|void|metadata|token)\b/, "type"],
           [/-?\b0x[0-9a-fA-F]+\b|-?\b\d+(?:\.\d+)?\b/, "number"],
-          [/[{}()\[\]]/, "@brackets"],
+          [/[{}()[\]]/, "@brackets"],
           [/[=,*]/, "delimiter"],
         ],
       },
     });
   }
 
-  // Rockstar (poetic literals — best-effort highlight).
+  // Rockstar (poetic literals - best-effort highlight).
   if (!has("rockstar")) {
     monaco.languages.register({ id: "rockstar" });
     monaco.languages.setMonarchTokensProvider("rockstar", {
@@ -390,7 +390,7 @@ export function registerCustomLanguages(monaco: Monaco) {
           [/\b\d+(\.\d+)?\b/, "number"],
           [/[A-Z][\w.]*/, "type"],
           [/[a-zA-Z_$][\w$]*/, { cases: { "@keywords": "keyword", "@default": "identifier" } }],
-          [/[{}()\[\]]/, "@brackets"],
+          [/[{}()[\]]/, "@brackets"],
           [/[<>=!+\-*/%&|^~?:.]+/, "operator"],
         ],
         comment: [
@@ -418,7 +418,7 @@ export function registerCustomLanguages(monaco: Monaco) {
           [/"([^"\\]|\\.)*"/, "string"],
           [/\b\d+(\.\d+)?([eE][+-]?\d+)?[ij]?\b/, "number"],
           [/[a-zA-Z_]\w*/, { cases: { "@keywords": "keyword", "@default": "identifier" } }],
-          [/[{}()\[\]]/, "@brackets"],
+          [/[{}()[\]]/, "@brackets"],
           [/[<>=!+\-*/\\^~?:.,;]+/, "operator"],
         ],
       },
@@ -445,7 +445,7 @@ export function registerCustomLanguages(monaco: Monaco) {
           [/"([^"\\]|\\.)*"/, "string"],
           [/\b\d+(_\d+)*(\.\d+(_\d+)*)?(#[0-9a-fA-F_]+#)?\b/, "number"],
           [/[a-zA-Z_]\w*/, { cases: { "@keywords": "keyword", "@default": "identifier" } }],
-          [/[{}()\[\]]/, "@brackets"],
+          [/[{}()[\]]/, "@brackets"],
           [/:=|=>|[<>=!+\-*/&.,;:]+/, "operator"],
         ],
       },
@@ -466,7 +466,7 @@ export function registerCustomLanguages(monaco: Monaco) {
           [/\b(?:nil|true|false|self|super|thisContext)\b/, "keyword"],
           [/[a-zA-Z_][\w]*:/, "type"],
           [/[a-zA-Z_][\w]*/, "identifier"],
-          [/[\[\]{}()]/, "@brackets"],
+          [/[[\]{}()]/, "@brackets"],
           [/[<>=!+\-*/~@%|&,^]+/, "operator"],
         ],
       },
@@ -495,7 +495,7 @@ export function registerCustomLanguages(monaco: Monaco) {
           [/@[A-Z]\w*/, "annotation"],
           [/[A-Z]\w*/, "type"],
           [/[a-zA-Z_$][\w$]*/, { cases: { "@keywords": "keyword", "@default": "identifier" } }],
-          [/[{}()\[\]]/, "@brackets"],
+          [/[{}()[\]]/, "@brackets"],
           [/[<>=!+\-*/%&|^~?:.]+/, "operator"],
         ],
         comment: [

@@ -45,17 +45,15 @@ async function runWat(code: string): Promise<ServerRunResult> {
       const bytes = await readFile(path.join(dir, "main.wasm"));
       const mod = await WebAssembly.instantiate(bytes, {});
       const exportNames = Object.keys(mod.instance.exports);
-      const zeroArgFn = exportNames.find(
-        (n) => typeof (mod.instance.exports as any)[n] === "function"
-      );
+      const zeroArgFn = exportNames.find((n) => typeof mod.instance.exports[n] === "function");
       let out = `Compiled successfully. Exports: ${exportNames.join(", ") || "(none)"}\n`;
       if (zeroArgFn) {
         try {
-          const fn = (mod.instance.exports as any)[zeroArgFn] as (...a: number[]) => number;
+          const fn = mod.instance.exports[zeroArgFn] as (...a: number[]) => number;
           const result = fn(1, 1); // harmless args for common 2-arity demo functions
           out += `${zeroArgFn}(1, 1) = ${result}\n`;
         } catch {
-          /* export isn't callable with these args — compile result still stands */
+          // export isn't callable with these args, compile result still stands
         }
       }
       return { stdout: out, stderr: "", ok: true };
@@ -68,7 +66,7 @@ async function runWat(code: string): Promise<ServerRunResult> {
 // -------------------- LLVM IR --------------------
 async function runLlvmIr(code: string): Promise<ServerRunResult> {
   if (!(await hasBinary("lli"))) {
-    return { stdout: "", stderr: "lli not found. Install: apt install llvm (fairly large — optional tier, see docs/DEPLOY.md)", ok: false };
+    return { stdout: "", stderr: "lli not found. Install: apt install llvm (fairly large, optional tier, see docs/DEPLOY.md)", ok: false };
   }
   return withWorkspace("main.ll", code, async (dir) => {
     const res = await run("lli", ["main.ll"], { cwd: dir, timeoutMs: 10_000 });

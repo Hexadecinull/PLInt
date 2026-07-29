@@ -23,10 +23,10 @@ AFTER_LOCK=""
 [ -f package-lock.json ] && AFTER_LOCK="$(sha256sum package-lock.json)"
 
 if [ "$BEFORE_LOCK" != "$AFTER_LOCK" ] || [ ! -d node_modules ]; then
-  log "dependencies changed — running npm install"
+  log "dependencies changed - running npm install"
   npm install --no-audit --no-fund 2>&1 | tee -a "$LOG"
 else
-  log "dependencies unchanged — skipping npm install"
+  log "dependencies unchanged - skipping npm install"
 fi
 
 log "building"
@@ -36,7 +36,7 @@ log "reloading plint via pm2 (zero-downtime)"
 if command -v pm2 >/dev/null 2>&1; then
   pm2 reload ecosystem.config.cjs --only plint --update-env 2>&1 | tee -a "$LOG"
 else
-  log "pm2 not found on PATH — start the app manually: pm2 start ecosystem.config.cjs"
+  log "pm2 not found on PATH - start the app manually: pm2 start ecosystem.config.cjs"
 fi
 
 log "== deploy done =="
