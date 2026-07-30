@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Terminal, ArrowRight, Github } from "lucide-react";
+import { Terminal, ArrowRight, GitBranch } from "lucide-react";
 import { ALL_LANGUAGES, LANGUAGES } from "@/lib/languages";
 
 export const Route = createFileRoute("/")({
