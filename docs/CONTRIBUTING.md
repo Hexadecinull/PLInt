@@ -40,9 +40,12 @@ machine's `PATH` will work.
   yet (its peer range is `>=4.8.4 <6.1.0`, and installing past that with
   `--force`/`--legacy-peer-deps` makes ESLint crash at runtime, not just
   at install time). Revisit this once typescript-eslint adds TS7 support.
-- Run `npm run lint` and `npm run format` before committing; CI runs
-  ESLint and a Prettier check on every push and PR (see
-  `.github/workflows/lint.yml`).
+- Run `npm run lint` before committing; CI runs ESLint on every push and PR
+  (see `.github/workflows/lint.yml`). Also run `npm run format` (Prettier)
+  before committing, it's not currently enforced in CI (the codebase
+  hasn't been run through it yet), but keeping new code formatted makes
+  a future `prettier --check` CI gate a one-line addition instead of a
+  giant diff.
 - Keep comments purposeful and short - explain *why*, not *what the code
   obviously does*.
 - Match the existing patterns in a file rather than introducing a new

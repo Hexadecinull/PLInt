@@ -19,7 +19,7 @@ import {
   type SavedFile,
 } from "@/lib/files";
 import { useAnimatedOpen } from "@/hooks/use-animated-open";
-import { useDialogs } from "@/lib/dialogs";
+import { useDialogs } from "@/lib/dialogs-context";
 import { useSettings } from "@/lib/settings";
 
 interface Props {

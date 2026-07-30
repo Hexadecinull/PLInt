@@ -72,6 +72,7 @@ front of the execution backend.
 
 ## Dependency updates
 
-The lint CI workflow doesn't currently include automated dependency
-vulnerability scanning. If you'd like to add Dependabot or a similar tool,
-pull requests are welcome - see [CONTRIBUTING.md](CONTRIBUTING.md).
+Dependabot is configured (`.github/dependabot.yml`) to open weekly pull
+requests for npm and GitHub Actions dependencies. Review and merge these
+regularly, security fixes for a project that executes arbitrary code are
+worth staying on top of.

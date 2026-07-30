@@ -36,5 +36,14 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
+  {
+    // shadcn/ui components follow the convention of co-locating small
+    // variant helpers (buttonVariants, badgeVariants, etc.) with their
+    // component in the same file. That's expected here, not a bug.
+    files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
   eslintConfigPrettier,
 );

@@ -1,45 +1,8 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { useAnimatedOpen } from "@/hooks/use-animated-open";
-
-type DialogKind = "alert" | "confirm" | "prompt";
-
-interface DialogOptions {
-  title?: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  danger?: boolean;
-}
-
-interface DialogRequest extends DialogOptions {
-  kind: DialogKind;
-  message: string;
-  defaultValue?: string;
-  resolve: (value: string | boolean | null) => void;
-}
-
-interface DialogsApi {
-  alert: (message: string, opts?: DialogOptions) => Promise<void>;
-  confirm: (message: string, opts?: DialogOptions) => Promise<boolean>;
-  prompt: (message: string, defaultValue?: string, opts?: DialogOptions) => Promise<string | null>;
-}
-
-const DialogsContext = createContext<DialogsApi | null>(null);
-
-export function useDialogs(): DialogsApi {
-  const ctx = useContext(DialogsContext);
-  if (!ctx) throw new Error("useDialogs must be used inside <DialogsProvider>");
-  return ctx;
-}
+import { DialogsContext, type DialogsApi, type DialogRequest } from "@/lib/dialogs-context";
 
 export function DialogsProvider({ children }: { children: ReactNode }) {
   const [request, setRequest] = useState<DialogRequest | null>(null);
