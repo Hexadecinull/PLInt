@@ -89,7 +89,7 @@ function Welcome() {
             aria-label="Source"
             className="hover:text-foreground"
           >
-            <Github className="h-4 w-4" />
+            <GitBranch className="h-4 w-4" />
           </a>
         </div>
       </header>
