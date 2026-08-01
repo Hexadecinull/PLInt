@@ -10,6 +10,13 @@ updates:
         dependency-type: "development"
       production-dependencies:
         dependency-type: "production"
+    ignore:
+      # typescript is intentionally pinned below TypeScript 7, see the note
+      # in docs/CONTRIBUTING.md. typescript-eslint doesn't support TS7 yet,
+      # and a major bump here breaks the install with an unresolvable peer
+      # dependency conflict. Remove this once typescript-eslint catches up.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"

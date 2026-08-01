@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState } from "react";
-import { X, ArrowLeft, GitBranch } from "lucide-react";
+import { X, ArrowLeft } from "lucide-react";
+import { GitHubIcon } from "@/components/icons/GitHubIcon";
 import { getServerEndpoint, setServerEndpoint } from "@/lib/runners";
 import { useSettings, type Settings } from "@/lib/settings";
 import { useAnimatedOpen } from "@/hooks/use-animated-open";
@@ -562,7 +563,7 @@ function AboutView({ onBack }: { onBack: () => void }) {
           rel="noreferrer noopener"
           className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 py-1.5 text-[11px] hover:bg-surface-3"
         >
-          <GitBranch className="h-3.5 w-3.5" /> Repo
+          <GitHubIcon className="h-3.5 w-3.5" /> Repo
         </a>
       </div>
 

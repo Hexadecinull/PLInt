@@ -197,12 +197,32 @@ bash scripts/deploy/update.sh
 ## Troubleshooting
 
 - **`pm2 logs plint` shows a port-in-use error** - something else is
-  already bound to `PORT`. Change it in `.env` and restart:
-  `pm2 restart plint --update-env`.
+  already bound to `PORT`. Change it in `.env`, then reload by referencing
+  the ecosystem file so PM2 actually re-reads it:
+  `pm2 reload ecosystem.config.cjs --only plint --update-env`.
+  (Plain `pm2 restart plint` reuses PM2's cached env and won't pick up
+  the change.)
+- **The webhook returns a Cloudflare 502** - this means nothing is
+  answering on the port Cloudflare Tunnel is routing to, not that your
+  app rejected the request. The most common cause: you changed
+  `WEBHOOK_PORT` (in `.env` or `ecosystem.config.cjs`) or the tunnel's
+  routed port, but `plint-webhook` is still running with its old,
+  cached port from whenever it was last started. `git pull` alone
+  doesn't restart it, PM2 caches env vars at start time. Fix:
+  `pm2 reload ecosystem.config.cjs --only plint-webhook --update-env`,
+  then confirm it's actually listening: `ss -tlnp | grep <port>`. Pushes
+  that touch `ecosystem.config.cjs` or `scripts/deploy/webhook-server.js`
+  now trigger this automatically (see `scripts/deploy/update.sh`), but
+  a change you deploy manually or via commands run directly on the
+  server still needs the manual reload above.
 - **A language always says "not found"** - its interpreter isn't
   installed, or isn't on the `PATH` that PM2's process sees. Confirm with
   `which <the-binary>` as the same user PM2 runs as.
 - **The webhook returns 401** - the secret in `.env` doesn't match what
-  you entered in GitHub's webhook settings.
+  you entered in GitHub's webhook settings. Also confirm
+  `GITHUB_WEBHOOK_SECRET` actually reaches the process:
+  `pm2 env plint-webhook | grep GITHUB_WEBHOOK_SECRET` (empty means the
+  reload above didn't pick up `.env`, e.g. it's not next to
+  `ecosystem.config.cjs`).
 - **Build fails after a `git pull`** - check `npm ls nitro` against the
   version pinned in `package.json`; see the Nitro note in step 3.

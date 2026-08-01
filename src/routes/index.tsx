@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Terminal, ArrowRight, GitBranch } from "lucide-react";
+import { Terminal, ArrowRight } from "lucide-react";
+import { GitHubIcon } from "@/components/icons/GitHubIcon";
 import { ALL_LANGUAGES, LANGUAGES } from "@/lib/languages";
 
 export const Route = createFileRoute("/")({
@@ -89,7 +90,7 @@ function Welcome() {
             aria-label="Source"
             className="hover:text-foreground"
           >
-            <GitBranch className="h-4 w-4" />
+            <GitHubIcon className="h-4 w-4" />
           </a>
         </div>
       </header>
